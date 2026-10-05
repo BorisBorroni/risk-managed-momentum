@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "risk-managed-momentum"
+version = "0.1.0"
+description = "Momentum gestito per il rischio (Barroso e Santa-Clara 2015): replica e test fuori campione sui dati di Kenneth French"
+requires-python = ">=3.10"
+dependencies = ["numpy>=1.24", "pandas>=2.2"]
+
+[project.optional-dependencies]
+dati = ["requests"]
+notebook = ["matplotlib", "nbformat", "nbclient", "ipykernel"]
+dev = ["pytest", "ruff==0.16.8", "matplotlib"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "B"]
+ignore = ["E501"]

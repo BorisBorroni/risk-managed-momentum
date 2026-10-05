@@ -1,0 +1,49 @@
+{
+ "regola": {
+  "obiettivo_volatilita": 0.12,
+  "finestra_giorni": 126,
+  "giorni_per_mese": 21,
+  "tetto_al_peso": null
+ },
+ "test": {
+  "inizio": "2012-01",
+  "fine": "2026-08",
+  "mesi": 176
+ },
+ "sottoperiodi": [
+  [
+   "2012-01",
+   "2015-12"
+  ],
+  [
+   "2016-01",
+   "2026-08"
+  ]
+ ],
+ "bootstrap": {
+  "ricampionamenti": 10000,
+  "blocco_medio": 6,
+  "seed": 0,
+  "livello": 0.95
+ },
+ "costi": {
+  "lordo": {
+   "prestito": 0.0,
+   "negoziazione": 0.0,
+   "variazione": 0.0
+  },
+  "medio": {
+   "prestito": 0.005,
+   "negoziazione": 0.02,
+   "variazione": 0.001
+  },
+  "alto": {
+   "prestito": 0.01,
+   "negoziazione": 0.04,
+   "variazione": 0.002
+  }
+ },
+ "ritardi_newey_west": 6,
+ "dati": "Kenneth R. French Data Library, database CRSP 202608",
+ "sha256_criteri": "bcbfabf6d34b040e5ae87e35b0c4e76de906cd3fc81b27343b388fd4cda790fd"
+}

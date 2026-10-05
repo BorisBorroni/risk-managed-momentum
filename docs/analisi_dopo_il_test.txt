@@ -1,0 +1,33 @@
+Analisi descrittive fatte dopo il test (non cambiano il verdetto)
+
+1. Meccanismo: correlazione della volatilita' prevista (dati fino a t-1) con il mese t
+  1927-2011  con la volatilita' realizzata +0.74   con il rendimento del WML -0.12 (t -3.9)   1016 mesi
+  test       con la volatilita' realizzata +0.65   con il rendimento del WML -0.14 (t -1.9)   176 mesi
+  WML semplice nel test per terzi del peso (peso basso = volatilita' prevista alta):
+    peso basso  59 mesi  media annua  -3.86% (errore standard 15.7%)  volatilita' annua  34.74%
+    peso medio  58 mesi  media annua  10.70% (errore standard 14.5%)  volatilita' annua  31.82%
+    peso alto   59 mesi  media annua  10.34% (errore standard 7.9%)  volatilita' annua  17.45%
+  t della media nel test, wml: 0.76
+  t della media nel test, wml_gestita: 1.43
+
+2. Timing o solo meno esposizione? WML semplice scalato alla volatilita' del gestito nel test
+  WML semplice         volatilita' 28.89%  drawdown  -64.77%  mese peggiore  -32.08%  curtosi 2.10  Sharpe 0.197
+  WML semplice x 0.423 volatilita' 12.22%  drawdown  -32.71%  mese peggiore  -13.57%  curtosi 2.10  Sharpe 0.197
+  WML gestito          volatilita' 12.22%  drawdown  -23.03%  mese peggiore  -12.52%  curtosi 1.05  Sharpe 0.375
+
+3. I 5 mesi peggiori del WML semplice nel test (rendimenti dei decili non in eccesso)
+  2020-04  semplice  -32.08%  peso 0.39  gestito  -12.52%  mercato  13.60%  vincenti  14.67%  perdenti  46.75%  mercato nei 24 mesi prima   -0.7%
+  2020-11  semplice  -27.10%  peso 0.20  gestito   -5.44%  mercato  12.45%  vincenti  10.38%  perdenti  37.48%  mercato nei 24 mesi prima   27.1%
+  2026-07  semplice  -22.71%  peso 0.26  gestito   -5.93%  mercato  -0.61%  vincenti -15.41%  perdenti   7.30%  mercato nei 24 mesi prima   41.4%
+  2021-02  semplice  -22.57%  peso 0.23  gestito   -5.16%  mercato   2.81%  vincenti  -2.78%  perdenti  19.79%  mercato nei 24 mesi prima   49.1%
+  2023-01  semplice  -21.58%  peso 0.26  gestito   -5.59%  mercato   6.61%  vincenti   0.52%  perdenti  22.10%  mercato nei 24 mesi prima   -0.8%
+
+4. Differenza di Sharpe (gestito meno semplice) nel test: solidita'
+  blocco 6, semi 0-19: limite inferiore tra +0.0003 e +0.0116, sotto zero in 0 casi su 20
+  blocco medio  1: IC95 [-0.026; +0.360]
+  blocco medio  3: IC95 [-0.006; +0.348]
+  blocco medio  6: IC95 [+0.003; +0.333]
+  blocco medio 12: IC95 [+0.023; +0.312]
+  blocco medio 24: IC95 [+0.044; +0.298]
+  Jobson-Korkie con correzione di Memmel (rendimenti indipendenti e normali): z 1.82, p 0.069, correlazione tra le due serie 0.93
+  Sharpe del WML semplice: 1927-2011 0.54 (errore standard 0.11), test 0.20 (errore standard 0.26); errore standard della differenza 0.28, t 1.22
