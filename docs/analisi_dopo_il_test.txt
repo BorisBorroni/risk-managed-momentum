@@ -10,7 +10,7 @@ Analisi descrittive fatte dopo il test (non cambiano il verdetto)
   t della media nel test, wml: 0.76
   t della media nel test, wml_gestita: 1.43
 
-2. Timing o solo meno esposizione? WML semplice scalato alla volatilita' del gestito nel test
+2. Conta il quando o solo il quanto? WML semplice scalato alla volatilita' del gestito nel test
   WML semplice         volatilita' 28.89%  drawdown  -64.77%  mese peggiore  -32.08%  curtosi 2.10  Sharpe 0.197
   WML semplice x 0.423 volatilita' 12.22%  drawdown  -32.71%  mese peggiore  -13.57%  curtosi 2.10  Sharpe 0.197
   WML gestito          volatilita' 12.22%  drawdown  -23.03%  mese peggiore  -12.52%  curtosi 1.05  Sharpe 0.375

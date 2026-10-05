@@ -1,8 +1,8 @@
 """Costi come ipotesi esplicite (i file di French non contengono il turnover dei portafogli).
 
 Per ogni mese, con peso w (1 per le strategie non gestite):
-- prestito titoli: tasso annuo / 12 x nozionale corto (w per la lungo-corta, 0 per il solo lungo);
-- negoziazione: tasso annuo / 12 x esposizione lorda (2w per la lungo-corta, w per il solo lungo);
+- prestito titoli: tasso annuo / 12 x nozionale corto (w per la strategia lungo-corta, 0 per il solo lungo);
+- negoziazione: tasso annuo / 12 x esposizione lorda (2w per la strategia lungo-corta, w per il solo lungo);
 - variazione del peso: costo per lato x esposizione lorda scambiata (2|dw| o |dw|).
 Il primo mese non paga la variazione del peso (la posizione iniziale non e' un ribilanciamento).
 """

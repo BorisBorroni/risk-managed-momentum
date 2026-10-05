@@ -15,7 +15,7 @@ def main():
     test = tabella.loc[cfg.TEST_INIZIO:cfg.TEST_FINE]
     (a1, b1), (a2, b2) = cfg.SOTTOPERIODI
     replica = serie.finestra(tabella, None, "2011-12-31", ["wml", "wml_gestita"])
-    grafici.capitale(test, IMG / "capitale_test.png", "Crescita di 1 € nel test, rendimenti in eccesso (gennaio 2012 - agosto 2026)")
+    grafici.capitale(test, IMG / "capitale_test.png", "Crescita di 1 $ nel test, rendimenti in eccesso (gennaio 2012 - agosto 2026)")
     grafici.drawdown(test, IMG / "drawdown_test.png", "Drawdown nel test: semplice contro gestito")
     grafici.peso(pesi["wml"].dropna(), cfg.TEST_INIZIO, IMG / "peso_nel_tempo.png")
     # il test completo e i suoi due sottoperiodi (che insieme lo compongono)

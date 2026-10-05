@@ -2,7 +2,7 @@
 
 1. Meccanismo: la volatilita' prevista anticipa la volatilita' realizzata del mese dopo, ma non
    il suo rendimento (se fosse cosi', il peso toglierebbe rischio senza togliere rendimento atteso).
-2. Timing contro semplice riduzione dell'esposizione: WML semplice scalato con una costante fino
+2. Il quando contro il quanto: WML semplice scalato con una costante fino
    ad avere la stessa volatilita' del gestito nel test (la costante usa dati del test: e' solo un confronto).
 3. Crolli: peso del WML gestito, decile vincente e perdente nei 5 mesi peggiori del WML semplice nel test.
 4. Solidita' della differenza di Sharpe: altri semi e altre lunghezze di blocco del bootstrap,
@@ -60,7 +60,7 @@ def main():
         righe.append(f"  t della media nel test, {nome}: {y.mean() / y.std(ddof=1) * np.sqrt(len(y)):.2f}")
 
     righe.append("")
-    righe.append("2. Timing o solo meno esposizione? WML semplice scalato alla volatilita' del gestito nel test")
+    righe.append("2. Conta il quando o solo il quanto? WML semplice scalato alla volatilita' del gestito nel test")
     k = test["wml_gestita"].std(ddof=1) / test["wml"].std(ddof=1)
     for nome, y in (("WML semplice", test["wml"]), (f"WML semplice x {k:.3f}", k * test["wml"]),
                     ("WML gestito", test["wml_gestita"])):

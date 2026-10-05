@@ -21,7 +21,8 @@ NOMI = {
 }
 
 
-def _formatta(t):
+def formatta(t):
+    """Tabella di misure in testo, con percentuali e due decimali."""
     t = t.copy()
     for c in ("media", "volatilita", "mese_peggiore", "mese_migliore", "drawdown"):
         t[c] = (100 * t[c]).map("{:.2f}%".format)
@@ -67,7 +68,7 @@ def analisi(tabella, pesi, inizio, fine, sottoperiodi, boot, ritardi):
     r.append(f"Finestra: {x.index[0]:%Y-%m} -> {x.index[-1]:%Y-%m}, {len(x)} mesi")
     r.append("")
     r.append("Misure lorde (rendimenti mensili in eccesso, valori annui):")
-    r.append(_formatta(misure.tabella({NOMI[c]: x[c] for c in colonne})))
+    r.append(formatta(misure.tabella({NOMI[c]: x[c] for c in colonne})))
     r.append("")
     r.append(f"Peso del WML gestito: minimo {w['wml'].min():.2f}, massimo {w['wml'].max():.2f}, "
              f"medio {w['wml'].mean():.2f}, mesi con peso sopra 1: {int((w['wml'] > 1).sum())}")

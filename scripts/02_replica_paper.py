@@ -11,7 +11,7 @@ from pathlib import Path
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-from risk_managed_momentum import dati, misure, serie  # noqa: E402
+from risk_managed_momentum import dati, esame, misure, serie  # noqa: E402
 
 RADICE = Path(__file__).resolve().parents[1]
 ESITO = RADICE / "docs" / "esito_replica.txt"
@@ -23,16 +23,6 @@ PAPER = {  # tabella 1 di Barroso e Santa-Clara (2015), periodo 1927-2011
 TOLLERANZA_SHARPE = 0.10
 
 
-def formatta(t):
-    t = t.copy()
-    for c in ("media", "volatilita", "mese_peggiore", "mese_migliore", "drawdown"):
-        t[c] = (100 * t[c]).map("{:.2f}%".format)
-    for c in ("sharpe", "asimmetria", "curtosi"):
-        t[c] = t[c].map("{:.2f}".format)
-    t["mesi"] = t["mesi"].astype(int)
-    return t.to_string()
-
-
 def main():
     tabella, pesi = serie.costruisci(dati.carica())
     x = serie.finestra(tabella, None, FINE, ["wml", "wml_gestita", "mom", "mom_gestita"])
@@ -40,10 +30,10 @@ def main():
     righe = []
     righe.append(f"Replica: {x.index[0]:%Y-%m} -> {x.index[-1]:%Y-%m}, {len(x)} mesi")
     righe.append("")
-    righe.append(formatta(misure.tabella({c: x[c] for c in x.columns})))
+    righe.append(esame.formatta(misure.tabella({esame.NOMI[c]: x[c] for c in x.columns})))
     righe.append("")
-    righe.append(f"Peso del momentum gestito: minimo {w.min():.2f}, massimo {w.max():.2f}, medio {w.mean():.2f} "
-                 "(paper: 0,13 - 2,00)")
+    righe.append(f"Peso del WML gestito: minimo {w.min():.2f}, massimo {w.max():.2f}, medio {w.mean():.2f} "
+                 "(paper: 0.13 - 2.00)")
     righe.append("")
     righe.append("Confronto con il paper (tabella 1):")
     esito = True
@@ -52,13 +42,13 @@ def main():
         diff = m["sharpe"] - attesi["sharpe"]
         ok = abs(diff) <= TOLLERANZA_SHARPE
         esito &= ok
-        righe.append(f"  {nome:12s} Sharpe {m['sharpe']:.2f} (paper {attesi['sharpe']:.2f}, differenza {diff:+.2f}, "
+        righe.append(f"  {esame.NOMI[nome]:13s} Sharpe {m['sharpe']:.2f} (paper {attesi['sharpe']:.2f}, differenza {diff:+.2f}, "
                      f"{'entro' if ok else 'FUORI'} +-{TOLLERANZA_SHARPE:.2f})   curtosi {m['curtosi']:.2f} "
                      f"(paper {attesi['curtosi']:.2f})   mese peggiore {100 * m['mese_peggiore']:.2f}% "
                      f"(paper {100 * attesi['mese_peggiore']:.2f}%)")
     corrette = {n: x[n].kurt() for n in PAPER}  # stimatore corretto per il campione (pandas)
     righe.append("  curtosi corretta per il campione (solo confronto): "
-                 + ", ".join(f"{n} {k:.2f}" for n, k in corrette.items()))
+                 + ", ".join(f"{esame.NOMI[n]} {k:.2f}" for n, k in corrette.items()))
     pieno = tabella["wml"].loc[:FINE]
     righe.append(f"  WML semplice su tutti i mesi {pieno.index[0]:%Y-%m} -> {FINE[:7]}: "
                  f"Sharpe {misure.sharpe(pieno):.2f}")
@@ -68,6 +58,7 @@ def main():
     print(testo)
     ESITO.parent.mkdir(exist_ok=True)
     ESITO.write_text(testo, encoding="utf-8")
+    (RADICE / "output").mkdir(exist_ok=True)
     pd.DataFrame(x).assign(peso=w).to_csv(RADICE / "output" / "replica_mensile.csv")
     if not esito:
         sys.exit(1)

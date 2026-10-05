@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 import pytest
 
@@ -68,18 +67,3 @@ def test_wml_e_mom_dai_sei():
 def test_carica_segnala_file_mancanti(tmp_path):
     with pytest.raises(FileNotFoundError, match="00_scarica_dati"):
         dati.carica(tmp_path)
-
-
-@pytest.mark.slow
-@pytest.mark.skipif(not dati.dati_presenti(), reason="dati di French non presenti in data/raw")
-def test_dati_reali_completi_e_coerenti():
-    d = dati.carica()
-    assert d.decili_m.index[0] == pd.Timestamp("1927-01-31")
-    assert d.decili_g.index[0] == pd.Timestamp("1926-11-03")
-    for x in (d.mom_m, d.sei_m, d.decili_m):
-        assert x.index.equals(d.decili_m.index)
-    for x in (d.mom_g, d.sei_g):
-        assert x.index.equals(d.decili_g.index)
-    assert d.decili_g.index.isin(d.fattori_g.index).all()
-    assert np.abs(dati.mom_dai_sei(d.sei_m) - d.mom_m).max() <= 0.0002
-    assert np.abs(dati.mom_dai_sei(d.sei_g) - d.mom_g).max() <= 0.0002

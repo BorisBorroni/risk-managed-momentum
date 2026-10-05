@@ -1,4 +1,4 @@
-"""Test fuori campione, gennaio 2012 - agosto 2026: da eseguire UNA sola volta.
+"""Test fuori campione, gennaio 2012 - agosto 2026: nella copia di lavoro si esegue una sola volta.
 
 Prima di partire lo script controlla che:
 - config_congelata.json esista e coincida con i valori del codice (regola, periodo, bootstrap, costi);

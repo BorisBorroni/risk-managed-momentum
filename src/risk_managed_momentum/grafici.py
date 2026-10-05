@@ -1,5 +1,5 @@
 """Grafici del README e del notebook. Stesso colore per la stessa strategia in tutti i grafici,
-etichette dirette al posto delle legende, un solo asse verticale."""
+etichette dirette sulle linee (legenda solo nel grafico a barre), un solo asse verticale."""
 import matplotlib
 
 matplotlib.use("Agg")
@@ -31,7 +31,7 @@ def _etichetta_finale(ax, serie, nome, colore, dy=0):
 
 
 def capitale(x, percorso, titolo):
-    """Crescita di 1 euro con i rendimenti mensili in eccesso, scala logaritmica."""
+    """Crescita di 1 dollaro con i rendimenti mensili in eccesso, scala logaritmica."""
     fig, ax = plt.subplots(figsize=(9, 4.6))
     _stile(ax)
     spostamenti = {"wml": -8, "wml_gestita": 0, "mercato": 0}
@@ -44,7 +44,7 @@ def capitale(x, percorso, titolo):
     ax.yaxis.set_major_locator(matplotlib.ticker.FixedLocator([0.5, 0.75, 1, 1.5, 2, 3, 4, 6, 8]))
     ax.yaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda v, _: f"{v:g}".replace(".", ",")))
     ax.yaxis.set_minor_locator(matplotlib.ticker.NullLocator())
-    ax.set_ylabel("valore di 1 € (scala logaritmica)", fontsize=9, color="#444444")
+    ax.set_ylabel("valore di 1 $ (scala logaritmica)", fontsize=9, color="#444444")
     ax.set_title(titolo, fontsize=11, loc="left", color=INCHIOSTRO)
     anni = range(x.index[0].year, x.index[-1].year + 1, 2)
     ax.set_xticks([pd.Timestamp(f"{a}-01-01") for a in anni], [str(a) for a in anni])
@@ -59,8 +59,10 @@ def drawdown(x, percorso, titolo):
     fig, ax = plt.subplots(figsize=(9, 4.2))
     _stile(ax)
     for nome in ("wml", "wml_gestita"):
+        # si parte dal capitale iniziale (drawdown 0 alla fine del mese prima del periodo)
         c = np.concatenate([[1.0], (1 + x[nome]).cumprod().to_numpy()])
-        dd = pd.Series((c / np.maximum.accumulate(c) - 1)[1:], index=x.index) * 100
+        inizio = x.index[0] - pd.offsets.MonthEnd(1)
+        dd = pd.Series(c / np.maximum.accumulate(c) - 1, index=x.index.insert(0, inizio)) * 100
         ax.plot(dd.index, dd, color=COLORI[nome], linewidth=2)
         minimo = dd.idxmin()
         ax.annotate(f"{NOMI[nome]}: {dd.min():.1f}%".replace(".", ",").replace("-", "−"), xy=(minimo, dd.min()),

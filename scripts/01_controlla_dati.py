@@ -78,6 +78,11 @@ def main():
     print(f"  giorni di borsa per mese in media: {per_mese.loc[:'1952-05'].mean():.1f} fino a maggio 1952, "
           f"{per_mese.loc['1952-06':].mean():.1f} da giugno 1952")
 
+    versione = dati.stessa_versione()
+    print(f"\nZip identici a quelli usati nel repository (versione CRSP 202608): {sum(versione.values())} su {len(versione)}")
+    if not all(versione.values()):
+        print("  Con dati di una versione diversa i numeri possono cambiare e lo script 04 puo' rifiutarsi di partire.")
+
     if problemi:
         sys.exit("PROBLEMI: " + "; ".join(problemi))
     print("\nTutti i controlli sono passati.")

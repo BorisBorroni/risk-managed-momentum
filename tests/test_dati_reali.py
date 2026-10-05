@@ -10,6 +10,11 @@ pytestmark = [pytest.mark.slow,
               pytest.mark.skipif(not dati.dati_presenti(), reason="dati di French non presenti in data/raw")]
 
 
+# i numeri versionati valgono per gli zip usati nel repository (versione CRSP 202608)
+stessa_versione = pytest.mark.skipif(not dati.dati_presenti() or not all(dati.stessa_versione().values()),
+                                     reason="zip diversi da quelli usati nel repository: i numeri possono cambiare")
+
+
 @pytest.fixture(scope="module")
 def caricati():
     d = dati.carica()
@@ -27,6 +32,7 @@ def test_pesi_reali_non_usano_dati_futuri(caricati):
     assert parziali.index[-1] == pd.Timestamp("2012-01-31")
 
 
+@stessa_versione
 def test_replica_entro_la_tolleranza(caricati):
     _, tabella, _ = caricati
     x = serie.finestra(tabella, None, "2011-12-31", ["wml", "wml_gestita"])
@@ -37,6 +43,7 @@ def test_replica_entro_la_tolleranza(caricati):
     assert f"Sharpe {misure.sharpe(x['wml_gestita']):.2f} (paper 0.97" in testo
 
 
+@stessa_versione
 def test_esito_versionato_coincide_con_il_calcolo(caricati):
     _, tabella, pesi = caricati
     righe, risultati = esame.analisi(tabella, pesi, cfg.TEST_INIZIO, cfg.TEST_FINE, cfg.SOTTOPERIODI,
@@ -44,3 +51,16 @@ def test_esito_versionato_coincide_con_il_calcolo(caricati):
     assert len(risultati["x"]) == 176
     testo = (cfg.RADICE / "docs" / "esito_test.txt").read_text(encoding="utf-8").replace("\r\n", "\n")
     assert "\n".join(righe) in testo
+
+
+def test_dati_reali_completi_e_coerenti(caricati):
+    d = caricati[0]
+    assert d.decili_m.index[0] == pd.Timestamp("1927-01-31")
+    assert d.decili_g.index[0] == pd.Timestamp("1926-11-03")
+    for x in (d.mom_m, d.sei_m, d.decili_m):
+        assert x.index.equals(d.decili_m.index)
+    for x in (d.mom_g, d.sei_g):
+        assert x.index.equals(d.decili_g.index)
+    assert d.decili_g.index.isin(d.fattori_g.index).all()
+    assert np.abs(dati.mom_dai_sei(d.sei_m) - d.mom_m).max() <= 0.0002
+    assert np.abs(dati.mom_dai_sei(d.sei_g) - d.mom_g).max() <= 0.0002
