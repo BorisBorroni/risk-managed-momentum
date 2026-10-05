@@ -9,7 +9,7 @@ Ho scritto da zero il codice, l'ho controllato con la replica del paper e poi l'
 Cercavo un effetto documentato su una storia lunga, con un meccanismo economico chiaro, dati gratuiti e regole già fissate dalla letteratura, così da non dover scegliere parametri guardando i risultati. Il momentum gestito per il rischio risponde a questi requisiti.
 
 **Il risultato è positivo?**
-Sul rischio sì, anche se una parte del miglioramento viene solo dall'esposizione più bassa (domanda successiva). Sullo Sharpe è "evidenza" per la regola fissata prima, ma al limite. Il momentum in sé ha reso poco dopo il 2011. I numeri sono nella [sezione 1 del README](../README.md#1-risultato-in-breve).
+Sul rischio sì, anche se una parte del miglioramento viene solo dall'esposizione più bassa (vedi la domanda "Il gestito riduce il rischio solo perché investe meno?"). Sullo Sharpe è "evidenza" per la regola fissata prima, ma al limite. Il momentum in sé ha reso poco dopo il 2011. I numeri sono nella [sezione 1 del README](../README.md#1-risultato-in-breve).
 
 **Perché lo Sharpe migliora se il peso medio è solo 0,50?**
 Lo Sharpe non dipende dalla scala: dimezzare sempre il peso lascerebbe lo Sharpe uguale. Migliora perché il peso è basso proprio nei mesi in cui il momentum oscilla di più e, nel test, ha reso meno: il terzo dei mesi con la volatilità prevista più alta ha media annua −3,86%, gli altri due circa +10%. Con 58-59 mesi per gruppo, però, queste medie hanno errori standard di 8-16 punti, quindi la differenza tra i gruppi da sola non è significativa.
@@ -36,19 +36,19 @@ Solo in parte. Con altri semi resta positivo (limite inferiore tra +0,0003 e +0,
 Il gestito resta davanti al semplice in ogni scenario, ma la differenza non è più distinguibile da zero. Nello scenario medio il gestito ha Sharpe 0,19, nello scenario alto circa zero. Con questi costi ipotizzati, su questo periodo la strategia lungo-corta non è interessante.
 
 **Perché la versione lungo-corta come principale?**
-È quella del paper, ed è dove la gestione del rischio dovrebbe agire: secondo Daniel e Moskowitz i crolli del momentum nascono soprattutto dalla gamba corta, quando i perdenti rimbalzano dopo un ribasso del mercato. Nel test quattro dei cinque mesi peggiori vengono dal rimbalzo dei perdenti con il mercato in rialzo, ma solo due arrivano dopo un mercato in calo, e di poco. Nel solo lungo, invece, la gestione dimezza volatilità e drawdown ma non cambia lo Sharpe (0,83 contro 0,84).
+È quella del paper, ed è dove la gestione del rischio dovrebbe agire: secondo Daniel e Moskowitz i crolli del momentum nascono soprattutto dalla gamba corta, quando i perdenti rimbalzano dopo un ribasso del mercato. Nel test quattro dei cinque mesi peggiori vengono dal rimbalzo dei perdenti con il mercato in rialzo, ma solo due arrivano dopo un mercato in calo, e di poco. Nel solo lungo, invece, la gestione dimezza volatilità e drawdown ma non cambia lo Sharpe (0,84 del gestito contro 0,83 del semplice).
 
 **C'è leva?**
 Nel campione storico sì, il peso arriva a 2,09. Nel test no: il peso va da 0,18 a 0,99, perché la volatilità prevista del momentum è sempre stata sopra il 12%.
 
 **Oltre al rischio più basso, il gestito ha un rendimento in più rispetto al semplice? (alfa)**
-Sì, nel test (è una misura descrittiva). Regredendo il gestito sul semplice l'alfa è del 2,33% annuo con t = 2,31 (errori di Newey e West), con beta 0,39. Il semplice moltiplicato per una costante avrebbe alfa zero: il rendimento in più viene dal momento in cui si riduce l'esposizione.
+Sì, nel test (è una misura descrittiva). Regredendo il gestito sul semplice l'alfa è del 2,33% annuo con t = 2,31 (errori di Newey e West), con beta 0,39. Il semplice moltiplicato per una costante avrebbe alfa zero: il rendimento in più viene dalla scelta di *quando* ridurre l'esposizione.
 
 **Conviene aggiungerlo a un portafoglio di mercato?**
 Nel test, mercato più WML gestito ha Sharpe 1,11 contro 0,94 e drawdown −18,8% contro −25,3%. La differenza di Sharpe però ha intervallo [−0,173; +0,468]: non è distinguibile da zero, ed è prima dei costi.
 
 **Il momentum funziona ancora?**
-In questo periodo poco: Sharpe 0,20 contro 0,54 del 1927-2011. Con un errore standard della differenza di circa 0,28, però, non è significativa: è coerente con il calo delle anomalie dopo la pubblicazione (McLean e Pontiff 2016), ma non lo dimostra. Il miglioramento della gestione del rischio si vede soprattutto nel 2016-2026, quando il momentum semplice ha avuto i crolli peggiori.
+In questo periodo poco: Sharpe 0,20 contro 0,54 del 1927-2011. Con un errore standard della differenza di circa 0,28, però, la differenza non è significativa: è coerente con il calo delle anomalie dopo la pubblicazione (McLean e Pontiff 2016), ma non lo dimostra. Il miglioramento della gestione del rischio si vede soprattutto nel 2016-2026, quando il momentum semplice ha avuto i crolli peggiori.
 
 **Che cosa cambieresti con più tempo?**
 Userei i rendimenti giornalieri dei decili mensili come nel paper (servono i dati CRSP a livello di titolo, non gratuiti). Stimerei il turnover vero per avere costi meno ipotetici. Proverei la stessa regola su mercati diversi dagli Stati Uniti come seconda verifica fuori campione.

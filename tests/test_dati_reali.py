@@ -12,7 +12,7 @@ pytestmark = [pytest.mark.slow,
 
 # i numeri versionati valgono per gli zip usati nel repository (versione CRSP 202608)
 stessa_versione = pytest.mark.skipif(not dati.dati_presenti() or not all(dati.stessa_versione().values()),
-                                     reason="zip diversi da quelli usati nel repository: i numeri possono cambiare")
+                                     reason="dati assenti o di una versione diversa da quella usata nel repository")
 
 
 @pytest.fixture(scope="module")

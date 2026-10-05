@@ -7,7 +7,7 @@ name = "risk-managed-momentum"
 version = "0.1.0"
 description = "Momentum gestito per il rischio (Barroso e Santa-Clara 2015): replica e test fuori campione sui dati di Kenneth French"
 requires-python = ">=3.10"
-dependencies = ["numpy>=1.24", "pandas>=2.2"]
+dependencies = ["numpy>=1.24", "pandas>=2.2.2"]
 
 [project.optional-dependencies]
 dati = ["requests"]
@@ -16,6 +16,9 @@ dev = ["pytest", "ruff==0.16.8", "matplotlib"]
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.ruff]
+extend-exclude = ["*.ipynb"]
 
 [tool.ruff.lint]
 select = ["E", "F", "B"]

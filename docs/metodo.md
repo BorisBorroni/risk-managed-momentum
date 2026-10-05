@@ -9,7 +9,7 @@ Ogni zip di French contiene un CSV con più blocchi uno sotto l'altro: rendiment
 Controlli in `scripts/01_controlla_dati.py`:
 
 - nessun valore mancante e nessun mese saltato;
-- mensili da 1927-01 a 2026-08 (1.196 mesi), giornalieri dal 1926-11-03 al 2026-08-31 (26.216 giorni); i giorni dei decili sono presenti in tutti gli altri file giornalieri (i fattori partono da luglio 1926);
+- mensili da 1927-01 a 2026-08 (1.196 mesi), giornalieri dal 1926-11-03 al 2026-08-31 (26.216 giorni); i giorni dei decili sono presenti in tutti gli altri file giornalieri (i 3 fattori partono da luglio 1926);
 - fattore Mom ricostruito dai 6 portafogli come 0,5 × (vincenti piccoli + vincenti grandi) − 0,5 × (perdenti piccoli + perdenti grandi): differenza massima 0,01 punti percentuali, sia mensile sia giornaliero, cioè l'arrotondamento dei file;
 - mercato mensile (Mkt-RF + RF) contro il composto dei giornalieri dello stesso mese: 1 mese su 1.201 differisce di più di 0,2 punti (settembre 1931, 0,40 punti).
 

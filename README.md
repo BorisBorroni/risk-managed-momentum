@@ -30,7 +30,7 @@ Sul periodo di test (gennaio 2012 - agosto 2026, 176 mesi), rendimenti lordi:
 - **Il rischio scende molto.** Il drawdown massimo passa da −64,8% a −23,0%, il mese peggiore da −32,1% a −12,5%, la curtosi in eccesso da 2,10 a 1,05. L'ipotesi sul rischio, fissata prima del test, è confermata. Una parte del calo viene però dalla sola esposizione più bassa (sezione 7.2).
 - **Lo Sharpe sale da 0,197 a 0,375.** La differenza, calcolata sui valori non arrotondati, è +0,177, con intervallo al 95% [+0,003; +0,333]. Per la regola fissata prima è "evidenza di miglioramento", ma il limite inferiore è appena sopra lo zero: è un'evidenza al limite.
 - **Il momentum in sé ha reso poco dopo il 2011.** Né il semplice né il gestito hanno uno Sharpe distinguibile da zero, mentre il mercato azionario nello stesso periodo ha Sharpe 0,94.
-- **Con i costi ipotizzati il vantaggio non è più distinguibile da zero.** Nello scenario medio (prestito titoli 0,5% e negoziazione 2% annui, 10 punti base sulla variazione del peso) il gestito scende a Sharpe 0,19; nello scenario alto la strategia lungo-corta non rende.
+- **Con i costi ipotizzati il vantaggio non è più distinguibile da zero.** Nello scenario medio (prestito titoli 0,5% annuo, negoziazione 2% annuo per unità di esposizione lorda, cioè 4% sulla strategia lungo-corta, e 10 punti base sulla variazione del peso) il gestito scende a Sharpe 0,19; nello scenario alto la strategia lungo-corta non rende.
 
 In sintesi: la gestione della volatilità riduce i crolli anche fuori campione. Il vantaggio sullo Sharpe c'è, ma è piccolo, si concentra nel 2016-2026 e con i costi resta positivo senza essere distinguibile da zero.
 
@@ -38,7 +38,7 @@ In sintesi: la gestione della volatilità riduce i crolli anche fuori campione. 
 
 ## 2. Termini essenziali
 
-**WML** è il rendimento del decile dei titoli vincenti (quelli con il rendimento passato più alto) meno quello del decile dei perdenti (il rendimento passato più basso). **WML semplice** è questa strategia con esposizione sempre pari a 1; **WML gestito** è la stessa strategia moltiplicata ogni mese per un **peso** che si abbassa quando la volatilità prevista sale. L'**indice di Sharpe** è il rendimento medio in eccesso diviso per la volatilità; il **drawdown massimo** è la perdita più grande dal punto più alto precedente del capitale; l'**intervallo al 95%** dice quanto è incerta una stima: se è tutto sopra lo zero, la differenza è distinguibile da zero. Tutti gli altri termini sono spiegati nel [glossario](#11-glossario).
+**WML** è il rendimento del decile dei titoli vincenti (quelli con il rendimento passato più alto) meno quello del decile dei perdenti (quelli con il rendimento passato più basso). **WML semplice** è questa strategia con esposizione sempre pari a 1; **WML gestito** è la stessa strategia moltiplicata ogni mese per un **peso** che si abbassa quando la volatilità prevista sale. L'**indice di Sharpe** è il rendimento medio in eccesso diviso per la volatilità; il **drawdown massimo** è la perdita più grande dal punto più alto precedente del capitale; l'**intervallo al 95%** dice quanto è incerta una stima: se è tutto sopra lo zero, la differenza è distinguibile da zero. Tutti gli altri termini sono spiegati nel [glossario](#11-glossario).
 
 ## 3. Come ho lavorato
 
@@ -48,7 +48,7 @@ Per non scegliere le regole guardando i risultati, ho fissato tutto prima di gua
 - **Replica come verifica del codice.** Prima ho rifatto i conti sul periodo del paper (1927-2011). La condizione per proseguire era ritrovare gli Sharpe del paper entro ±0,10.
 - **Criteri scritti prima del test.** In [docs/criteri_del_verdetto.md](docs/criteri_del_verdetto.md) ci sono le due ipotesi e la regola di decisione. Il repository non può provare quando li ho scritti, quindi è una mia dichiarazione. La configurazione è congelata in `config_congelata.json` insieme all'impronta SHA-256 dei criteri.
 - **Test eseguito una volta.** `scripts/04_test_fuori_campione.py` si rifiuta di partire se i criteri sono cambiati, se la configurazione non coincide con i valori del codice o se nella copia di lavoro l'esito esiste già. È una protezione contro i rilanci per errore, non una garanzia. L'esito originale è in [docs/esito_test.txt](docs/esito_test.txt).
-- **Analisi dopo il test, dichiarate come tali.** La sensibilità del bootstrap, il confronto a pari volatilità, il meccanismo e i mesi di crollo li ho calcolati dopo ([docs/analisi_dopo_il_test.txt](docs/analisi_dopo_il_test.txt)). Aiutano a leggere il risultato, ma non cambiano il verdetto.
+- **Analisi dopo il test, dichiarate come tali.** La sensibilità del bootstrap, il test di Jobson e Korkie con la correzione di Memmel, gli errori standard degli Sharpe, il confronto a pari volatilità, il meccanismo e i mesi di crollo li ho calcolati dopo ([docs/analisi_dopo_il_test.txt](docs/analisi_dopo_il_test.txt)). Aiutano a leggere il risultato, ma non cambiano il verdetto.
 
 Le due ipotesi:
 
@@ -64,10 +64,10 @@ Tutti i dati vengono dalla [Kenneth R. French Data Library](https://mba.tuck.dar
 | 10 portafogli sul momentum, mensili | WML = decile vincente meno decile perdente; vincenti solo lunghi |
 | 10 portafogli sul momentum, giornalieri | WML giornaliero, solo per stimare la volatilità |
 | Fattore Mom, mensile e giornaliero | robustezza: la versione di French del momentum (6 portafogli taglia × momentum) |
-| 6 portafogli taglia × momentum | controllo: il fattore Mom si ricostruisce da questi |
+| 6 portafogli taglia × momentum, mensili e giornalieri | controllo: il fattore Mom si ricostruisce da questi |
 | 3 fattori, mensili e giornalieri | mercato (Mkt-RF) e tasso privo di rischio (RF) |
 
-Periodi dei portafogli sul momentum: mensili da gennaio 1927 ad agosto 2026 (1.196 mesi), giornalieri dal 3 novembre 1926 al 31 agosto 2026 (26.216 giorni); i file dei fattori partono da luglio 1926. `scripts/01_controlla_dati.py` verifica che non ci siano valori mancanti né mesi saltati, che i giorni dei decili siano presenti in tutti i file giornalieri, che il fattore Mom si ricostruisca dai 6 portafogli (differenza massima 0,01 punti, cioè l'arrotondamento) e che il mercato mensile coincida con il composto dei giornalieri. Controlla anche che gli zip siano quelli usati qui (impronte SHA-256 in `src/risk_managed_momentum/dati.py`).
+Periodi dei portafogli sul momentum: mensili da gennaio 1927 ad agosto 2026 (1.196 mesi), giornalieri dal 3 novembre 1926 al 31 agosto 2026 (26.216 giorni); i file dei 3 fattori partono da luglio 1926. `scripts/01_controlla_dati.py` verifica che non ci siano valori mancanti né mesi saltati, che i giorni dei decili siano presenti in tutti i file giornalieri, che il fattore Mom si ricostruisca dai 6 portafogli (differenza massima 0,01 punti, cioè l'arrotondamento) e che il mercato mensile coincida con il composto dei giornalieri (entro 0,2 punti, con una sola eccezione nel 1931). Controlla anche che gli zip siano quelli usati qui (impronte SHA-256 in `src/risk_managed_momentum/dati.py`).
 
 I portafogli mensili sono ricostituiti ogni mese (rendimento passato da t−12 a t−2), quelli giornalieri ogni giorno. I rendimenti della strategia vengono sempre dai file mensili; i giornalieri servono solo a stimare la volatilità.
 
@@ -122,7 +122,7 @@ I pesi vanno da 0,14 a 2,09 (nel paper 0,13-2,00). La replica è superata ([docs
 | Mercato | 13,57% | 14,48% | 0,94 | 0,97 | −13,37% | −25,28% |
 | Mercato + WML gestito | 18,15% | 16,39% | 1,11 | 0,80 | −12,49% | −18,80% |
 
-**Verdetto.** Ipotesi 1 (rischio): confermata. Ipotesi 2 (Sharpe): 0,197 contro 0,375, differenza +0,177, intervallo al 95% [+0,003; +0,333], quindi "evidenza di miglioramento" per la regola fissata prima, al limite. Con blocchi del bootstrap più corti (1 o 3 mesi) l'intervallo include lo zero, e il test di Jobson e Korkie con la correzione di Memmel dà p = 0,069.
+**Verdetto.** Ipotesi 1 (rischio): confermata. Ipotesi 2 (Sharpe): 0,197 contro 0,375, differenza +0,177, intervallo al 95% [+0,003; +0,333], quindi "evidenza di miglioramento" per la regola fissata prima, al limite. Con blocchi medi più corti (1 o 3 mesi) l'intervallo include lo zero, e il test di Jobson e Korkie con la correzione di Memmel dà p = 0,069.
 
 Altre letture, tutte descrittive:
 
@@ -130,7 +130,7 @@ Altre letture, tutte descrittive:
 - Regredendo il gestito sul semplice, l'alfa è del 2,33% annuo (t = 2,31, errori di Newey e West) con beta 0,39: il gestito non è solo una versione ridotta del semplice.
 - Nel test il peso va da 0,18 a 0,99, con media 0,50. La volatilità prevista del momentum è stata sempre sopra il 12%, quindi la strategia non ha mai usato leva.
 - A pari volatilità (confronto fatto dopo il test) il guadagno sul rischio si riduce. Il WML semplice moltiplicato per 0,423 ha la stessa volatilità del gestito (12,22%); rispetto a questa versione il gestito ha drawdown −23,0% contro −32,7%, curtosi 1,05 contro 2,10 e mese peggiore −12,5% contro −13,6%. Il "quando" ridurre l'esposizione conta, ma meno di quanto dica il confronto diretto, e sul mese peggiore quasi per niente.
-- Sui vincenti solo lunghi la gestione dimezza volatilità e drawdown ma non cambia lo Sharpe (0,83 contro 0,84; differenza +0,012 [−0,172; +0,176]): qui agisce solo come riduzione dell'esposizione. È coerente con l'idea che il guadagno sullo Sharpe passi dalla gamba corta.
+- Sui vincenti solo lunghi la gestione dimezza volatilità e drawdown ma non cambia lo Sharpe (0,84 del gestito contro 0,83 del semplice; differenza +0,012 [−0,172; +0,176]): qui agisce solo come riduzione dell'esposizione. È coerente con l'idea che il guadagno sullo Sharpe passi dalla gamba corta.
 - Mercato + WML gestito ha Sharpe 1,11 contro 0,94 del mercato e drawdown −18,8% contro −25,3%, ma la differenza di Sharpe (+0,170 [−0,173; +0,468]) non è distinguibile da zero.
 
 ![Drawdown nel test](img/drawdown_test.png)
@@ -147,11 +147,11 @@ Altre letture, tutte descrittive:
 
 Mercato: rendimento in eccesso su RF. Vincenti e perdenti: rendimenti dei due decili, non in eccesso.
 
-I cinque mesi peggiori del semplice arrivano tutti con un peso tra 0,20 e 0,39, fissato con i dati del mese prima e sotto la media del test (0,50). In quattro casi su cinque il crollo viene dal rimbalzo dei perdenti, con il mercato in rialzo. È simile al meccanismo di Daniel e Moskowitz, anche se solo aprile 2020 e gennaio 2023 arrivano dopo due anni di mercato in calo, e di poco (−0,7% e −0,8%). Luglio 2026 è diverso: lì sono crollati i vincenti.
+I cinque mesi peggiori del semplice arrivano tutti con un peso tra 0,20 e 0,39, fissato con i dati del mese prima e sotto la media del test (0,50). In quattro casi su cinque il crollo viene dal rimbalzo dei perdenti, con il mercato in rialzo. È simile al meccanismo di Daniel e Moskowitz, anche se solo aprile 2020 e gennaio 2023 arrivano dopo due anni di mercato in calo, e di poco (rendimento totale cumulato −0,7% e −0,8%). Luglio 2026 è diverso: lì sono crollati i vincenti.
 
-La volatilità prevista ha una correlazione di +0,65 con quella realizzata nel mese dopo: il rischio si prevede bene. Con il rendimento del WML la correlazione è −0,14 (t ≈ −1,9): nel test il rendimento non sale quando la volatilità prevista è alta, ma questo da solo non è statisticamente distinguibile da zero.
+La volatilità prevista ha una correlazione di +0,65 con quella realizzata nel mese dopo: il rischio si prevede bene. Con il rendimento del WML la correlazione è −0,14 (t ≈ −1,9): nel test il rendimento non sale quando la volatilità prevista è alta, ma questa correlazione negativa da sola non è statisticamente distinguibile da zero.
 
-Per sottoperiodi il quadro è meno uniforme. Nel 2012-2015 le due versioni hanno lo stesso Sharpe (0,59 contro 0,60). Nel 2016-2026 il semplice scende a 0,10 e il gestito tiene 0,29.
+Per sottoperiodi il quadro è meno uniforme. Nel 2012-2015 le due versioni hanno lo stesso Sharpe (0,59 contro 0,60). Nel 2016-2026 il semplice scende a 0,10, il gestito a 0,29.
 
 ![Sharpe per periodo](img/sharpe_per_periodo.png)
 
@@ -159,11 +159,11 @@ Per sottoperiodi il quadro è meno uniforme. Nel 2012-2015 le due versioni hanno
 
 I file di French non dicono quanto si scambia, quindi i costi sono ipotesi esplicite (dettagli in [docs/metodo.md](docs/metodo.md)):
 
-| Scenario | Prestito titoli | Negoziazione | Variazione del peso | Sharpe semplice | Sharpe gestito | Differenza [IC 95%] |
+| Scenario | Prestito titoli (sul nozionale corto) | Negoziazione (per unità di esposizione lorda) | Variazione del peso | Sharpe semplice | Sharpe gestito | Differenza [IC 95%] |
 |---|---|---|---|---|---|---|
 | lordo | 0% | 0% | 0 pb | 0,20 | 0,37 | +0,177 [+0,003; +0,333] |
 | medio | 0,5% | 2% | 10 pb | 0,04 | 0,19 | +0,144 [−0,029; +0,298] |
-| alto | 1% | 4% | 20 pb | −0,11 | 0,00 | +0,110 [−0,062; +0,263] |
+| alto | 1% | 4% | 20 pb | −0,11 | −0,00 | +0,110 [−0,062; +0,263] |
 
 Il gestito resta davanti al semplice in tutti gli scenari perché parte da uno Sharpe lordo più alto. Paga circa metà dei costi in punti di rendimento, ma ha meno della metà della volatilità, quindi in termini di Sharpe i costi lo penalizzano un po' di più: la differenza scende a +0,144 e +0,110 e non è più distinguibile da zero. Negli scenari medio e alto nessuna delle due versioni lungo-corte ha un rendimento interessante nel periodo di test.
 
@@ -195,7 +195,7 @@ python -m pytest -q                           # test automatici
 
 I numeri esatti si ottengono solo con gli stessi zip (versione CRSP 202608, impronte in `dati.py`). French pubblica sempre l'ultima versione: con dati più recenti lo script 04 si ferma perché i dati non finiscono più ad agosto 2026, i numeri della replica possono cambiare leggermente e i test che confrontano gli esiti versionati vengono saltati. Con gli stessi zip, rieseguire il test su una copia nuova deve dare lo stesso testo di `docs/esito_test.txt`.
 
-Nella CI su GitHub i dati non ci sono, quindi lì girano solo i test sulle funzioni; i test sui dati reali (marcati `slow`) girano in locale. Il notebook [notebooks/risultati.ipynb](notebooks/risultati.ipynb) rilegge i risultati con le stesse funzioni.
+Nella CI su GitHub (integrazione continua: i test automatici girano a ogni modifica caricata su GitHub) i dati non ci sono, quindi lì girano solo i test sulle funzioni; i test sui dati reali (marcati `slow`) girano in locale. Il notebook [notebooks/risultati.ipynb](notebooks/risultati.ipynb) rilegge i risultati con le stesse funzioni.
 
 ## 10. Struttura del repository
 
@@ -221,7 +221,7 @@ config_congelata.json
 
 | Termine | Significato |
 |---|---|
-| Momentum | Tendenza dei titoli saliti (o scesi) di più negli ultimi mesi a continuare nella stessa direzione per qualche mese. |
+| Momentum, anomalia | Momentum: tendenza dei titoli saliti (o scesi) di più negli ultimi mesi a continuare nella stessa direzione per qualche mese. È un'anomalia, cioè una regolarità dei rendimenti non spiegata dai modelli di rischio standard. |
 | Rendimento passato da t−12 a t−2 | Il criterio di ordinamento: rendimento dei 12 mesi precedenti escluso l'ultimo, che si salta perché nel mese più recente i prezzi tendono a invertirsi. |
 | Decile | Uno dei 10 gruppi in cui French divide i titoli in base al rendimento passato, con i punti di taglio calcolati sui soli titoli NYSE. Decile vincente (Hi PRIOR) = il gruppo con il rendimento passato più alto; decile perdente (Lo PRIOR) = quello con il più basso. |
 | Pesato per capitalizzazione | Ogni titolo pesa nel portafoglio in proporzione al suo valore di borsa. |
@@ -234,7 +234,7 @@ config_congelata.json
 | Vincenti solo lunghi | Solo il decile vincente comprato, senza scoperto, misurato in eccesso su RF. |
 | RF | Tasso privo di rischio: rendimento dei titoli di Stato USA a un mese. |
 | Rendimento in eccesso | Rendimento meno RF: quello che una strategia guadagna in più rispetto alla liquidità. |
-| Mercato (Mkt-RF) | Rendimento in eccesso di tutte le azioni USA quotate su NYSE, AMEX e NASDAQ, pesate per capitalizzazione. |
+| Mercato (Mkt-RF), mercato + WML gestito | Mercato: rendimento in eccesso di tutte le azioni USA quotate su NYSE, AMEX e NASDAQ, pesate per capitalizzazione. Mercato + WML gestito: somma dei due rendimenti in eccesso, cioè il mercato con il WML gestito sovrapposto; l'esposizione totale è sopra 1. |
 | Volatilità | Deviazione standard dei rendimenti, espressa su base annua. Prevista: stimata con i dati passati; realizzata: misurata dopo, sul periodo stesso. Volatilità obiettivo: il 12% annuo a cui la strategia gestita cerca di portare il rischio. |
 | Peso, esposizione, leva | Peso = quanto si investe nella strategia per ogni dollaro di capitale. Esposizione lorda del lungo-corto = 2 × peso (gamba lunga più gamba corta); nozionale corto (valore dei titoli venduti allo scoperto) = peso. Con peso sopra 1 si investe più del WML semplice: è leva rispetto alla strategia di base. |
 | Indice di Sharpe | Rendimento medio in eccesso diviso per la volatilità, su base annua: quanto rende ogni unità di rischio. Non cambia se si moltiplica la strategia per una costante positiva. |
@@ -243,14 +243,14 @@ config_congelata.json
 | Curtosi in eccesso | Misura le code della distribuzione rispetto a una normale con la stessa volatilità (che ha 0): valori alti vogliono dire mesi estremi più frequenti di quanto la volatilità farebbe pensare. |
 | Pari volatilità | WML semplice moltiplicato per una costante, scelta in modo che abbia la stessa volatilità del gestito: separa l'effetto del "quanto" rischio da quello del "quando". |
 | Replica, fuori campione, test, sottoperiodo | Replica: rifare i conti del paper sul suo periodo (1927-2011). Fuori campione o test: il periodo che il paper non ha visto (gennaio 2012 - agosto 2026). Sottoperiodo: una parte del test (2012-2015 e 2016-2026). Da non confondere con i test automatici del codice (cartella `tests/`) e con i test statistici. |
-| Errore standard, t, p | Errore standard: incertezza di una stima. t = stima / errore standard (oltre circa 2 in valore assoluto la stima è distinguibile da zero). p: probabilità di un risultato almeno così estremo se l'effetto vero fosse zero. |
+| Errore standard, t, z, p | Errore standard: incertezza di una stima. t (o z) = stima / errore standard (oltre circa 2 in valore assoluto la stima è distinguibile da zero). p: probabilità di un risultato almeno così estremo se l'effetto vero fosse zero. |
 | Intervallo di confidenza al 95% (IC 95%) | Intervallo costruito in modo da contenere il valore vero nel 95% dei casi: se è tutto sopra lo zero, la differenza è distinguibile da zero. |
-| Bootstrap stazionario | Si ricrea molte volte (10.000) una storia alternativa ricampionando blocchi di mesi consecutivi, di lunghezza casuale e in media di 6 mesi, per misurare l'incertezza senza supporre rendimenti normali. Il seme fissa la sequenza casuale, così il risultato è riproducibile. Test di Jobson-Korkie con la correzione di Memmel: controllo classico sulla differenza di Sharpe, che suppone rendimenti indipendenti e normali. |
-| Alfa e beta | Regredendo il gestito sul semplice: beta = quanta parte del semplice contiene; alfa = rendimento in più che rimane, su base annua. Newey e West: metodo per calcolare l'errore standard quando i mesi sono correlati tra loro. |
-| Costi: prestito titoli, negoziazione, variazione del peso | Prestito: quanto si paga all'anno per prendere in prestito i titoli venduti allo scoperto. Negoziazione: costo annuo del ribilanciamento dei decili, che cambiano composizione ogni mese (turnover = quota del portafoglio scambiata). Variazione del peso: costo di comprare o vendere quando il peso cambia da un mese all'altro. Scenari lordo, medio, alto: nessun costo, costi moderati, costi elevati (sezione 7.4). Punti base (pb): centesimi di punto percentuale, 10 pb = 0,10%. |
+| Bootstrap stazionario | Si ricrea molte volte (10.000) una storia alternativa ricampionando blocchi di mesi consecutivi, di lunghezza casuale e in media di 6 mesi, per misurare l'incertezza senza supporre rendimenti normali. Il seme fissa la sequenza casuale, così il risultato è riproducibile. |
+| Test di Jobson-Korkie con la correzione di Memmel | Controllo classico sulla differenza tra due Sharpe, che suppone rendimenti indipendenti e normali; usato qui solo come verifica del bootstrap. |
+| Alfa e beta | Regredendo il gestito sul semplice: beta = quanta parte del semplice contiene; alfa = rendimento in più che rimane, su base annua. |
+| Newey e West | Metodo per calcolare l'errore standard di una regressione quando i mesi sono correlati tra loro (qui con 6 ritardi). |
+| Costi: prestito titoli, negoziazione, variazione del peso | Prestito: quanto si paga all'anno per prendere in prestito i titoli venduti allo scoperto. Negoziazione: costo annuo del ribilanciamento dei decili, che cambiano composizione ogni mese (turnover = quota del portafoglio scambiata). Variazione del peso: costo di comprare o vendere quando il peso cambia da un mese all'altro. Scenari lordo, medio, alto: nessun costo e due livelli ipotetici di costo, non calibrati sulla letteratura (sezione 7.4). Punti base (pb): centesimi di punto percentuale, 10 pb = 0,10%. |
 | Ribilanciamento, ricostituzione | Ribilanciamento: riportare ogni mese la strategia al peso deciso. Ricostituzione: rifare l'ordinamento dei titoli nei decili (ogni mese nei file mensili, ogni giorno nei giornalieri). |
-| Mercato + WML gestito | Somma dei due rendimenti in eccesso: si tiene il mercato e in più il WML gestito sopra (sovrapposizione), quindi l'esposizione totale è sopra 1. |
-| Anomalia | Regolarità dei rendimenti non spiegata dai modelli di rischio standard, come il momentum. |
 | Impronta SHA-256 | Codice calcolato dal contenuto di un file: se il file cambia anche di un carattere, l'impronta cambia. Serve a dimostrare che i criteri non sono stati modificati dopo il congelamento. |
 | CRSP, distorsione da sopravvivenza | CRSP: il database dei prezzi azionari USA su cui French costruisce i portafogli. Distorsione da sopravvivenza: errore che nasce usando solo i titoli ancora quotati; qui non c'è perché sono inclusi anche quelli usciti dal listino. |
 

@@ -77,3 +77,28 @@ def test_memmel_e_errore_standard_a_mano():
     inverso = misure.memmel(a, a[::-1])
     assert inverso["z"] == pytest.approx(0, abs=1e-12) and inverso["p"] == pytest.approx(1)
     assert misure.errore_standard_sharpe(a) == pytest.approx(np.sqrt((1 + sa ** 2 / 2) / 300) * np.sqrt(12))
+
+
+def serie_con_statistiche(media, dev, n, rng, base=None, rho=0.0):
+    """Serie con media, deviazione standard (ddof=1) e correlazione con base esattamente fissate."""
+    z = rng.normal(size=n)
+    z = z - z.mean()
+    if base is not None:
+        b = (base - base.mean()) / base.std(ddof=1)
+        z = z - (z @ b) / (b @ b) * b  # ortogonale alla base
+        z = z / z.std(ddof=1)
+        z = rho * b + np.sqrt(1 - rho ** 2) * z
+    return media + dev * z / z.std(ddof=1)
+
+
+def test_memmel_e_errore_standard_con_valori_calcolati_a_parte():
+    rng = np.random.default_rng(7)
+    a = serie_con_statistiche(0.01, 0.05, 100, rng)            # Sharpe mensile 0,2
+    b = serie_con_statistiche(0.005, 0.05, 100, rng, a, 0.9)   # Sharpe mensile 0,1, correlazione 0,9
+    # varianza = (2 - 1,8 + 0,5 (0,04 + 0,01 - 2 x 0,2 x 0,1 x 0,81)) / 100 = 0,002088; z = 0,1 / 0,04570
+    t = misure.memmel(a, b)
+    assert t["correlazione"] == pytest.approx(0.9)
+    assert t["z"] == pytest.approx(2.18843, rel=1e-4)
+    assert t["p"] == pytest.approx(0.02864, abs=1e-4)
+    # errore standard dello Sharpe annuo: radice((1 + 0,2^2 / 2) / 100) x radice(12) = 0,34986
+    assert misure.errore_standard_sharpe(a) == pytest.approx(0.34986, rel=1e-4)
