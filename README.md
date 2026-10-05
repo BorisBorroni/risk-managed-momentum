@@ -1,21 +1,22 @@
 # Momentum gestito per il rischio: replica e test dopo il 2011
 
-In questo progetto replico la strategia di Barroso e Santa-Clara (2015), "Momentum has its moments". La base è il momentum lungo-corto di Jegadeesh e Titman (1993): comprare i titoli che sono saliti di più nell'ultimo anno e vendere allo scoperto quelli scesi di più. Nella versione del paper l'esposizione è scalata in base alla volatilità prevista. Poi provo la strategia sul periodo successivo ai dati del paper, gennaio 2012 - agosto 2026, con le stesse regole e senza scegliere io i parametri della strategia.
+In questo progetto replico la strategia di Barroso e Santa-Clara (2015), "Momentum has its moments". La base è il momentum lungo-corto di Jegadeesh e Titman (1993): comprare i titoli che sono saliti di più nell'ultimo anno e vendere allo scoperto quelli scesi di più. Questa strategia si chiama WML, *winners minus losers* (vincenti meno perdenti). Nella versione del paper l'esposizione è scalata in base alla volatilità prevista. Poi provo la strategia sul periodo successivo ai dati del paper, gennaio 2012 - agosto 2026, con le stesse regole e senza scegliere io i parametri della strategia.
 
-Le domande sono due: **la gestione del rischio riduce i crolli del momentum anche dopo il 2011?** E **migliora il rendimento per unità di rischio (Sharpe)?**
+Le domande sono due: **la gestione del rischio riduce i crolli del momentum anche dopo il 2011?** E **migliora il rendimento per unità di rischio (indice di Sharpe)?** Tutti i termini tecnici sono spiegati nella [sezione 2](#2-termini-usati).
 
 ## Indice
 
 1. [Risultato in breve](#1-risultato-in-breve)
-2. [Come ho lavorato](#2-come-ho-lavorato)
-3. [Dati](#3-dati)
-4. [Il metodo in quattro passi](#4-il-metodo-in-quattro-passi)
-5. [Cosa confronto](#5-cosa-confronto)
-6. [Risultati](#6-risultati)
-7. [Limiti](#7-limiti)
-8. [Come riprodurre i numeri](#8-come-riprodurre-i-numeri)
-9. [Struttura del repository](#9-struttura-del-repository)
-10. [Riferimenti](#10-riferimenti)
+2. [Termini usati](#2-termini-usati)
+3. [Come ho lavorato](#3-come-ho-lavorato)
+4. [Dati](#4-dati)
+5. [Il metodo in quattro passi](#5-il-metodo-in-quattro-passi)
+6. [Cosa confronto](#6-cosa-confronto)
+7. [Risultati](#7-risultati)
+8. [Limiti](#8-limiti)
+9. [Come riprodurre i numeri](#9-come-riprodurre-i-numeri)
+10. [Struttura del repository](#10-struttura-del-repository)
+11. [Riferimenti](#11-riferimenti)
 
 I dettagli tecnici (formule, convenzioni, bootstrap, costi, controlli sui dati) sono in [docs/metodo.md](docs/metodo.md). In [docs/domande_e_risposte.md](docs/domande_e_risposte.md) ci sono le risposte brevi alle domande più probabili.
 
@@ -25,7 +26,7 @@ I dettagli tecnici (formule, convenzioni, bootstrap, costi, controlli sui dati) 
 
 Sul periodo di test (gennaio 2012 - agosto 2026, 176 mesi), rendimenti lordi:
 
-- **Il rischio scende molto.** Il drawdown massimo passa dal 64,8% al 23,0%, il mese peggiore da −32,1% a −12,5%, la curtosi in eccesso da 2,10 a 1,05. L'ipotesi sul rischio, fissata prima del test, è confermata: dovevano migliorare tutte e tre le misure. Buona parte di questo calo viene però dalla sola esposizione più bassa. Confrontato con il semplice ridotto alla stessa volatilità (confronto fatto dopo il test), il gestito ha ancora un drawdown più basso (−23,0% contro −32,7%) e metà curtosi, ma quasi lo stesso mese peggiore (−12,5% contro −13,6%).
+- **Il rischio scende molto.** Il drawdown massimo passa da −64,8% a −23,0%, il mese peggiore da −32,1% a −12,5%, la curtosi in eccesso da 2,10 a 1,05. L'ipotesi sul rischio, fissata prima del test, è confermata: dovevano migliorare tutte e tre le misure. Buona parte di questo calo viene però dalla sola esposizione più bassa. Confrontato con il semplice ridotto alla stessa volatilità (confronto fatto dopo il test), il gestito ha ancora un drawdown più basso (−23,0% contro −32,7%) e metà curtosi, ma quasi lo stesso mese peggiore (−12,5% contro −13,6%).
 - **Lo Sharpe sale da 0,197 a 0,375.** La differenza, calcolata sui valori non arrotondati, è +0,177, con intervallo al 95% [+0,003; +0,333]. Secondo la regola fissata prima è "evidenza di miglioramento", ma il limite inferiore è appena sopra lo zero: è un'evidenza al limite. Con blocchi del bootstrap più corti (1 o 3 mesi) l'intervallo include lo zero, e un test classico (Jobson-Korkie con la correzione di Memmel) dà p = 0,069.
 - **Il momentum in sé è andato male dopo il 2011.** Sharpe 0,20 per il semplice e 0,37 per il gestito, nessuno dei due distinguibile da zero. Il mercato azionario nello stesso periodo ha Sharpe 0,94.
 - **Con i costi il quadro peggiora.** Con lo scenario medio (prestito titoli 0,5%, negoziazione 2% annuo) lo Sharpe del gestito scende a 0,19 e la differenza con il semplice non è più distinguibile da zero. Con lo scenario alto il lungo-corto non rende.
@@ -34,7 +35,46 @@ In sintesi: la gestione della volatilità fa quello che promette, cioè taglia i
 
 ![Crescita del capitale nel test](img/capitale_test.png)
 
-## 2. Come ho lavorato
+## 2. Termini usati
+
+| Termine | Significato |
+|---|---|
+| Momentum | Tendenza dei titoli saliti (o scesi) di più negli ultimi mesi a continuare nella stessa direzione per qualche mese. |
+| Rendimento passato da t−12 a t−2 | Il criterio di ordinamento: rendimento dei 12 mesi precedenti escluso l'ultimo, che si salta perché nel mese più recente i prezzi tendono a invertirsi. |
+| Decile | Uno dei 10 gruppi in cui French divide i titoli in base al rendimento passato, con i punti di taglio calcolati sui soli titoli NYSE. Decile vincente (Hi PRIOR) = il gruppo con il rendimento passato più alto; decile perdente (Lo PRIOR) = quello con il più basso. |
+| Pesato per capitalizzazione | Ogni titolo pesa nel portafoglio in proporzione al suo valore di borsa. |
+| WML (*winners minus losers*) | Rendimento del decile vincente meno quello del decile perdente: si comprano i vincenti e si vendono allo scoperto i perdenti, per lo stesso importo. |
+| Lungo-corto, gamba lunga e gamba corta | Strategia con una parte comprata (gamba lunga, i vincenti) e una venduta allo scoperto (gamba corta, i perdenti). |
+| Vendita allo scoperto | Vendere titoli presi in prestito, per ricomprarli dopo: si guadagna se scendono. Il prestito ha un costo. |
+| Autofinanziata | Il denaro incassato con lo scoperto paga l'acquisto: il rendimento della strategia è già un rendimento in eccesso. |
+| WML semplice e WML gestito | Semplice: WML con esposizione sempre pari a 1. Gestito: WML moltiplicato ogni mese per il peso (sezione 5). |
+| Mom di French | Il fattore momentum della biblioteca di French: media dei vincenti piccoli e grandi meno media dei perdenti piccoli e grandi, con il 30% estremo invece del 10%. |
+| Vincenti solo lunghi | Solo il decile vincente comprato, senza scoperto, misurato in eccesso su RF. |
+| RF | Tasso privo di rischio: rendimento dei titoli di Stato USA a un mese. |
+| Rendimento in eccesso | Rendimento meno RF: quello che una strategia guadagna in più rispetto alla liquidità. |
+| Mercato (Mkt-RF) | Rendimento in eccesso di tutte le azioni USA quotate su NYSE, AMEX e NASDAQ, pesate per capitalizzazione. |
+| Volatilità | Deviazione standard dei rendimenti, espressa su base annua. Prevista: stimata con i dati passati; realizzata: misurata dopo, sul periodo stesso. Volatilità obiettivo: il 12% annuo a cui la strategia gestita cerca di portare il rischio. |
+| Peso, esposizione, leva | Peso = quanto si investe nella strategia per ogni euro di capitale. Esposizione lorda del lungo-corto = 2 × peso (gamba lunga più gamba corta); nozionale corto = peso. Con peso sopra 1 si investe più del WML semplice: è leva rispetto alla strategia di base. |
+| Indice di Sharpe | Rendimento medio in eccesso diviso per la volatilità, su base annua: quanto rende ogni unità di rischio. Non cambia se si moltiplica la strategia per una costante positiva. |
+| Drawdown massimo | La perdita più grande dal punto più alto precedente del capitale (per esempio −64,8% = il capitale è sceso al 35,2% del suo massimo). |
+| Mese peggiore | Il rendimento mensile più basso del periodo. |
+| Asimmetria | Misura se le perdite estreme sono più ampie dei guadagni estremi (negativa, coda sinistra più lunga) o il contrario (positiva). |
+| Curtosi in eccesso | Misura le code della distribuzione rispetto a una normale con la stessa volatilità (che ha 0): valori alti vogliono dire mesi estremi più frequenti di quanto la volatilità farebbe pensare. |
+| Pari volatilità | WML semplice moltiplicato per una costante, scelta in modo che abbia la stessa volatilità del gestito: separa l'effetto del "quanto" rischio da quello del "quando". |
+| Replica, fuori campione, test, sottoperiodo | Replica: rifare i conti del paper sul suo periodo (1927-2011). Fuori campione o test: il periodo che il paper non ha visto (gennaio 2012 - agosto 2026). Sottoperiodo: una parte del test (2012-2015 e 2016-2026). Da non confondere con i test automatici del codice (cartella `tests/`) e con i test statistici. |
+| Errore standard, t, p | Errore standard: incertezza di una stima. t = stima / errore standard (oltre circa 2 in valore assoluto la stima è distinguibile da zero). p: probabilità di un risultato almeno così estremo se l'effetto vero fosse zero. |
+| Intervallo di confidenza al 95% (IC 95%) | Intervallo costruito in modo da contenere il valore vero nel 95% dei casi: se è tutto sopra lo zero, la differenza è distinguibile da zero. |
+| Bootstrap stazionario | Si ricrea molte volte (10.000) una storia alternativa ricampionando blocchi di mesi consecutivi, di lunghezza casuale e in media di 6 mesi, per misurare l'incertezza senza supporre rendimenti normali. Test di Jobson-Korkie con la correzione di Memmel: controllo classico sulla differenza di Sharpe, che suppone rendimenti indipendenti e normali. |
+| Alfa e beta | Regredendo il gestito sul semplice: beta = quanta parte del semplice contiene; alfa = rendimento in più che rimane, su base annua. Newey e West: metodo per calcolare l'errore standard quando i mesi sono correlati tra loro. |
+| Punti base (pb) | Centesimi di punto percentuale: 10 pb = 0,10%. |
+| Costi: prestito titoli, negoziazione, variazione del peso | Prestito: quanto si paga all'anno per prendere in prestito i titoli venduti allo scoperto. Negoziazione: costo annuo del ribilanciamento dei decili, che cambiano composizione ogni mese (turnover = quota del portafoglio scambiata). Variazione del peso: costo di comprare o vendere quando il peso cambia da un mese all'altro. Scenari lordo, medio, alto: nessun costo, costi moderati, costi elevati (sezione 7.4). |
+| Ribilanciamento, ricostituzione | Ribilanciamento: riportare ogni mese la strategia al peso deciso. Ricostituzione: rifare l'ordinamento dei titoli nei decili (ogni mese nei file mensili, ogni giorno nei giornalieri). |
+| Mercato + WML gestito | Somma dei due rendimenti in eccesso: si tiene il mercato e in più il WML gestito sopra (sovrapposizione), quindi l'esposizione totale è sopra 1. |
+| Anomalia | Regolarità dei rendimenti non spiegata dai modelli di rischio standard, come il momentum. |
+| Impronta SHA-256 | Codice calcolato dal contenuto di un file: se il file cambia anche di un carattere, l'impronta cambia. Serve a dimostrare che i criteri non sono stati modificati dopo il congelamento. |
+| CRSP, distorsione da sopravvivenza | CRSP: il database dei prezzi azionari USA su cui French costruisce i portafogli. Distorsione da sopravvivenza: errore che nasce usando solo i titoli ancora quotati; qui non c'è perché sono inclusi anche quelli usciti dal listino. |
+
+## 3. Come ho lavorato
 
 Il rischio maggiore in un progetto come questo è ingannarsi da soli, provando varianti finché una funziona. Per evitarlo ho fissato tutto prima di guardare il periodo di test.
 
@@ -49,7 +89,7 @@ Le due ipotesi:
 1. **Rischio:** il WML gestito ha drawdown massimo, mese peggiore e curtosi in eccesso più bassi del WML semplice. È confermata solo se migliorano tutte e tre.
 2. **Sharpe (misura primaria):** differenza di Sharpe gestito meno semplice, con intervallo al 95% da bootstrap stazionario. Evidenza se l'intervallo è tutto sopra lo zero; indicazione debole se la stima è positiva ma l'intervallo include lo zero; altrimenti nessun miglioramento.
 
-## 3. Dati
+## 4. Dati
 
 Tutti i dati vengono dalla [Kenneth R. French Data Library](https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html) (versione costruita sul database CRSP 202608). Sono gratuiti e non soffrono di distorsione da sopravvivenza, perché i portafogli includono anche i titoli poi usciti dal listino.
 
@@ -67,18 +107,20 @@ Un dettaglio importante: i portafogli mensili sono ricostituiti ogni mese (rendi
 
 I dati non sono nel repository: `scripts/00_scarica_dati.py` li scarica (controllando prima il robots.txt), oppure si scaricano a mano (istruzioni nello script).
 
-## 4. Il metodo in quattro passi
+## 5. Il metodo in quattro passi
 
 1. **Momentum (WML).** Ogni mese il rendimento di WML è il decile dei vincenti meno quello dei perdenti, pesati per capitalizzazione. La strategia è autofinanziata (lo scoperto finanzia l'acquisto), quindi il suo rendimento è già un rendimento in eccesso.
 2. **Volatilità prevista.** Alla fine del mese t−1 prendo gli ultimi 126 rendimenti giornalieri di WML (circa sei mesi; prima del 1952 si contrattava anche il sabato, quindi circa cinque) e calcolo la varianza mensile come 21 × media dei quadrati. La volatilità annua è la radice di 12 volte la varianza mensile.
 3. **Peso.** Peso del mese t = 12% / volatilità prevista. Se il momentum è agitato il peso scende sotto 1, se è calmo sale sopra 1. Non c'è un tetto.
-4. **Rendimento gestito.** Rendimento del mese t = peso × WML del mese t. Il peso usa solo dati fino al mese prima: lo controllano i test (alterare i giorni del mese t non cambia il peso del mese t; troncare i dati non cambia i pesi passati).
+4. **Rendimento gestito.** Rendimento del mese t = peso × WML del mese t. Il peso usa solo dati fino al mese prima: lo controllano i test automatici in `tests/` (alterare i giorni del mese t non cambia il peso del mese t; troncare i dati non cambia i pesi passati).
 
 L'idea economica: la volatilità del momentum è molto persistente e si prevede bene, mentre il suo rendimento medio non è più alto quando la volatilità è alta. Scalando per la volatilità si toglie soprattutto rischio, non rendimento atteso. Secondo Daniel e Moskowitz (2016) i crolli del momentum arrivano soprattutto quando, dopo un ribasso del mercato e in fasi di alta volatilità, il mercato rimbalza e i titoli perdenti (la gamba corta) salgono di colpo: sono periodi in cui la volatilità prevista era già alta.
 
+Moreira e Muir (2017) hanno esteso l'idea ad altri fattori, ma Cederburg e coautori (2020) mostrano che, applicate in tempo reale, le versioni gestite per la volatilità non battono in modo sistematico gli originali. Per questo serve un test fuori campione su una strategia precisa, invece di dare il risultato per scontato.
+
 ![Peso nel tempo](img/peso_nel_tempo.png)
 
-## 5. Cosa confronto
+## 6. Cosa confronto
 
 | Serie | Perché |
 |---|---|
@@ -90,9 +132,9 @@ L'idea economica: la volatilità del momentum è molto persistente e si prevede 
 
 Tutte le serie sono rendimenti mensili in eccesso sul tasso privo di rischio. Sharpe annuo = media / deviazione standard × √12.
 
-## 6. Risultati
+## 7. Risultati
 
-### 6.1 Replica del paper (maggio 1927 - dicembre 2011, 1.016 mesi)
+### 7.1 Replica del paper (maggio 1927 - dicembre 2011, 1.016 mesi)
 
 | | Sharpe | paper | Curtosi in eccesso | paper | Mese peggiore | paper |
 |---|---|---|---|---|---|---|
@@ -101,9 +143,9 @@ Tutte le serie sono rendimenti mensili in eccesso sul tasso privo di rischio. Sh
 
 I pesi vanno da 0,14 a 2,09 (nel paper 0,13-2,00). La replica è superata ([docs/esito_replica.txt](docs/esito_replica.txt)). Sugli Sharpe la distanza è piccola; sulle code del gestito è più ampia (curtosi 2,00 contro 2,68, mese peggiore −24,2% contro −28,4%). Le cause probabili, che non ho verificato una per una, sono la versione più recente del database CRSP, il WML giornaliero ricostituito ogni giorno che uso per la volatilità e un mese iniziale forse diverso da quello del paper.
 
-### 6.2 Test fuori campione (gennaio 2012 - agosto 2026, 176 mesi)
+### 7.2 Test fuori campione (gennaio 2012 - agosto 2026, 176 mesi)
 
-| | Media annua | Volatilità | Sharpe | Curtosi | Mese peggiore | Drawdown massimo |
+| | Media annua | Volatilità | Sharpe | Curtosi in eccesso | Mese peggiore | Drawdown massimo |
 |---|---|---|---|---|---|---|
 | WML semplice | 5,70% | 28,89% | 0,20 | 2,10 | −32,08% | −64,77% |
 | **WML gestito** | 4,58% | 12,22% | 0,37 | 1,05 | −12,52% | −23,03% |
@@ -127,7 +169,7 @@ Altre letture (descrittive):
 
 ![Drawdown nel test](img/drawdown_test.png)
 
-### 6.3 Dove nasce il miglioramento
+### 7.3 Dove nasce il miglioramento
 
 | Mese | WML semplice | Peso | WML gestito | Mercato | Vincenti | Perdenti |
 |---|---|---|---|---|---|---|
@@ -143,7 +185,7 @@ Per sottoperiodi il quadro è meno uniforme. Nel 2012-2015 le due versioni hanno
 
 ![Sharpe per periodo](img/sharpe_per_periodo.png)
 
-### 6.4 Costi
+### 7.4 Costi
 
 I file di French non dicono quanto si scambia, quindi i costi sono ipotesi esplicite (dettagli in [docs/metodo.md](docs/metodo.md)):
 
@@ -155,16 +197,16 @@ I file di French non dicono quanto si scambia, quindi i costi sono ipotesi espli
 
 Il gestito resta davanti al semplice in tutti gli scenari, perché ha esposizione media più bassa e quindi paga meno; con i costi però la differenza non è più distinguibile da zero. Con costi realistici nessuna delle due versioni lungo-corte ha un rendimento interessante nel periodo di test.
 
-## 7. Limiti
+## 8. Limiti
 
 - **Portafogli teorici.** I decili di French non hanno costi, vincoli allo scoperto né impatto di mercato. I costi sono solo scenari.
 - **Volatilità dal file giornaliero.** Uso il WML giornaliero ricostituito ogni giorno, non i rendimenti giornalieri dei decili mensili come il paper. Sugli Sharpe della replica la differenza è piccola.
 - **Sabati prima del 1952.** Fino a maggio 1952 la borsa era aperta anche il sabato (24,5 giorni al mese in media): 126 giorni sono circa cinque mesi e il fattore 21 sottostima la varianza mensile, quindi i pesi storici sono un po' più alti. Seguo la stessa convenzione del paper; nel test non conta.
 - **Un solo periodo di test, con potenza limitata.** 176 mesi sono pochi per distinguere differenze di Sharpe dell'ordine di 0,1-0,2. Il limite inferiore a +0,003 va letto come un risultato al confine, non come una prova solida.
 - **Leva senza tetto.** Nel campione storico il peso arriva a 2,09. Nel test non supera 1, ma in un periodo calmo la strategia userebbe leva.
-- **Il momentum è stato più debole nel test.** Il WML semplice ha Sharpe 0,20 contro 0,54 del 1927-2011, ma con un errore standard della differenza di circa 0,28 non è significativa. È coerente con il calo delle anomalie dopo la pubblicazione (McLean e Pontiff 2016), ma questo progetto non lo dimostra.
+- **Il momentum è stato più debole nel test.** Il WML semplice ha Sharpe 0,20 contro 0,54 del 1927-2011, ma con un errore standard della differenza di circa 0,28 (formula di Lo 2002) non è significativa. È coerente con il calo delle anomalie dopo la pubblicazione (McLean e Pontiff 2016), ma questo progetto non lo dimostra.
 
-## 8. Come riprodurre i numeri
+## 9. Come riprodurre i numeri
 
 Con Python 3.10 o successivo:
 
@@ -183,7 +225,7 @@ Nella CI su GitHub i dati non ci sono, quindi lì girano solo i test sulle funzi
 
 `scripts/03_congela_configurazione.py` non va rilanciato: `config_congelata.json` esiste già e lo script si rifiuta di sovrascriverlo. Su una copia nuova il test si può rieseguire e deve dare lo stesso testo di `docs/esito_test.txt` (lo controlla anche `tests/test_dati_reali.py`). Il notebook [notebooks/risultati.ipynb](notebooks/risultati.ipynb) rilegge i risultati con le stesse funzioni.
 
-## 9. Struttura del repository
+## 10. Struttura del repository
 
 ```
 src/risk_managed_momentum/
@@ -203,7 +245,7 @@ notebooks/           risultati.ipynb
 config_congelata.json
 ```
 
-## 10. Riferimenti
+## 11. Riferimenti
 
 - Barroso, P. e Santa-Clara, P. (2015). Momentum has its moments. *Journal of Financial Economics*, 116(1), 111-120.
 - Daniel, K. e Moskowitz, T. J. (2016). Momentum crashes. *Journal of Financial Economics*, 122(2), 221-247.

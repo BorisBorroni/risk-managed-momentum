@@ -1,6 +1,6 @@
 # Domande e risposte
 
-Risposte brevi alle domande che mi aspetto. I dettagli sono in [metodo.md](metodo.md).
+Risposte brevi alle domande che mi aspetto. I dettagli sono in [metodo.md](metodo.md); i termini (WML = *winners minus losers*, vincenti meno perdenti, e gli altri) sono spiegati nella sezione 2 del [README](../README.md#2-termini-usati).
 
 **Che cosa hai fatto di tuo, se la strategia è di un paper?**
 Ho scritto da zero il codice, l'ho controllato con la replica del paper e poi l'ho provato su 14 anni e 8 mesi che il paper non poteva vedere (2012-2026), con regole e criteri fissati prima. In più ho aggiunto i confronti (Mom di French, solo lungo, mercato), i costi e l'analisi dei crolli.
@@ -18,10 +18,10 @@ Lo Sharpe non dipende dalla scala: dimezzare sempre il peso lascerebbe lo Sharpe
 In parte sì. Se prendo il WML semplice e lo moltiplico per 0,423, in modo che abbia la stessa volatilità del gestito nel test (scelta fatta a posteriori, solo come confronto), il drawdown scende a −32,7% e il mese peggiore a −13,6%. Il gestito fa meglio: −23,0%, −12,5%, curtosi dimezzata (1,05 contro 2,10) e Sharpe 0,375 contro 0,197. Il contributo del "quando" ridurre il rischio è quindi reale, ma più piccolo di quello del confronto diretto, e sul mese peggiore è quasi nullo.
 
 **Il peso usa informazioni future?**
-No. Il peso del mese t usa i giorni fino alla fine del mese t−1. Tre test lo controllano: alterare i giorni del mese t non cambia il peso del mese t; troncare i dati non cambia i pesi passati; sui dati reali il peso di gennaio 2012 si calcola con i dati fino a dicembre 2011.
+No. Il peso del mese t usa i giorni fino alla fine del mese t−1. Tre test automatici in `tests/` lo controllano: alterare i giorni del mese t non cambia il peso del mese t; troncare i dati non cambia i pesi passati; sui dati reali il peso di gennaio 2012 si calcola con i dati fino a dicembre 2011.
 
 **Perché la replica non dà esattamente i numeri del paper?**
-Il database CRSP viene rivisto nel tempo e io uso la versione 202608. In più stimo la volatilità con il file giornaliero di French, in cui i decili sono riformati ogni giorno, mentre il paper usa i giornalieri dei decili mensili. Le differenze sono piccole: Sharpe 0,54 contro 0,53 e 1,00 contro 0,97.
+Il database CRSP viene rivisto nel tempo e io uso la versione 202608. In più stimo la volatilità con il file giornaliero di French, in cui i decili sono riformati ogni giorno, mentre il paper usa i giornalieri dei decili mensili. Sugli Sharpe le differenze sono piccole (0,54 contro 0,53 e 1,00 contro 0,97); sulle code del gestito sono più ampie (curtosi 2,00 contro 2,68, mese peggiore −24,2% contro −28,4%). Non ho verificato una per una le cause.
 
 **Come fai a sapere che non hai guardato il test prima?**
 Non posso dimostrarlo, è una mia dichiarazione. Il repository mostra che i criteri hanno un'impronta registrata in `config_congelata.json` e che lo script del test controlla l'impronta e non riparte nella stessa copia di lavoro. È una protezione contro gli errori, non una prova: chi clona il repository può rieseguire il test, e deve ottenere lo stesso testo di `docs/esito_test.txt`.
@@ -41,8 +41,8 @@ Il gestito resta davanti al semplice in ogni scenario, ma la differenza non è p
 **C'è leva?**
 Nel campione storico sì, il peso arriva a 2,09. Nel test no: il peso va da 0,18 a 0,99, perché la volatilità prevista del momentum è sempre stata sopra il 12%.
 
-**Il gestito è solo il semplice con meno esposizione?**
-No. Regredendo il gestito sul semplice l'alfa è del 2,33% annuo con t = 2,31 (errori di Newey e West), con beta 0,39. Una versione semplicemente ridotta avrebbe alfa zero.
+**Oltre al rischio più basso, il gestito ha un rendimento in più rispetto al semplice? (alfa)**
+Sì, nel test (è una misura descrittiva). Regredendo il gestito sul semplice l'alfa è del 2,33% annuo con t = 2,31 (errori di Newey e West), con beta 0,39. Una versione semplicemente ridotta del semplice avrebbe alfa zero: il rendimento in più viene dal momento in cui si riduce l'esposizione.
 
 **Conviene aggiungerlo a un portafoglio di mercato?**
 Nel test, mercato più WML gestito ha Sharpe 1,11 contro 0,94 e drawdown −18,8% contro −25,3%. La differenza di Sharpe però ha intervallo [−0,173; +0,468]: non è distinguibile da zero, ed è prima dei costi.

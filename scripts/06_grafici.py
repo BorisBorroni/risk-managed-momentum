@@ -18,11 +18,12 @@ def main():
     grafici.capitale(test, IMG / "capitale_test.png", "Crescita di 1 € nel test, rendimenti in eccesso (gennaio 2012 - agosto 2026)")
     grafici.drawdown(test, IMG / "drawdown_test.png", "Drawdown nel test: semplice contro gestito")
     grafici.peso(pesi["wml"].dropna(), cfg.TEST_INIZIO, IMG / "peso_nel_tempo.png")
+    # il test completo e i suoi due sottoperiodi (che insieme lo compongono)
     valori = {
-        "Replica 1927-2011": {n: misure.sharpe(replica[n]) for n in ("wml", "wml_gestita")},
-        f"Test {a1[:4]}-{b1[:4]}": {n: misure.sharpe(test.loc[a1:b1, n]) for n in ("wml", "wml_gestita")},
-        f"Test {a2[:4]}-{b2[:4]}": {n: misure.sharpe(test.loc[a2:b2, n]) for n in ("wml", "wml_gestita")},
-        "Test 2012-2026": {n: misure.sharpe(test[n]) for n in ("wml", "wml_gestita")},
+        "Replica\n1927-2011": {n: misure.sharpe(replica[n]) for n in ("wml", "wml_gestita")},
+        f"Test completo\n{a1[:4]}-{b2[:4]}": {n: misure.sharpe(test[n]) for n in ("wml", "wml_gestita")},
+        f"Sottoperiodo del test\n{a1[:4]}-{b1[:4]}": {n: misure.sharpe(test.loc[a1:b1, n]) for n in ("wml", "wml_gestita")},
+        f"Sottoperiodo del test\n{a2[:4]}-{b2[:4]}": {n: misure.sharpe(test.loc[a2:b2, n]) for n in ("wml", "wml_gestita")},
     }
     grafici.sharpe_periodi(valori, IMG / "sharpe_per_periodo.png")
     for nome in sorted(p.name for p in IMG.glob("*.png")):

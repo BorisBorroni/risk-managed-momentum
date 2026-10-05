@@ -1,6 +1,6 @@
 # Metodo: dettagli tecnici
 
-Questo documento raccoglie i dettagli che nel README sono solo accennati. I numeri citati vengono da [esito_replica.txt](esito_replica.txt), [esito_test.txt](esito_test.txt) e [analisi_dopo_il_test.txt](analisi_dopo_il_test.txt).
+Questo documento raccoglie i dettagli che nel README sono solo accennati. I termini (WML, *winners minus losers*, Sharpe, drawdown, curtosi, bootstrap e gli altri) sono spiegati nella [sezione 2 del README](../README.md#2-termini-usati). I numeri citati vengono da [esito_replica.txt](esito_replica.txt), [esito_test.txt](esito_test.txt) e [analisi_dopo_il_test.txt](analisi_dopo_il_test.txt).
 
 ## 1. Lettura dei dati
 
@@ -13,7 +13,7 @@ Controlli in `scripts/01_controlla_dati.py`:
 - fattore Mom ricostruito dai 6 portafogli come 0,5 × (vincenti piccoli + vincenti grandi) − 0,5 × (perdenti piccoli + perdenti grandi): differenza massima 0,01 punti percentuali, sia mensile sia giornaliero, cioè l'arrotondamento dei file;
 - mercato mensile (Mkt-RF + RF) contro il composto dei giornalieri dello stesso mese: 1 mese su 1.201 differisce di più di 0,2 punti (settembre 1931, 0,40 punti).
 
-Lo script stampa anche il calendario. Gli unici due intervalli lunghi tra giorni di borsa sono la chiusura delle banche del marzo 1933 (12 giorni tra due sedute) e la chiusura dopo l'11 settembre 2001 (7 giorni tra due sedute). Fino al 24 maggio 1952 si contrattava anche il sabato (1.142 sabati): fino a maggio 1952 un mese ha in media 24,5 giorni di borsa, da giugno 1952 21,0.
+Lo script stampa anche il calendario. Gli unici due intervalli lunghi tra giorni di borsa sono la chiusura delle banche del marzo 1933 (12 giorni tra due sedute) e la chiusura dopo l'11 settembre 2001 (7 giorni tra due sedute). Fino al 24 maggio 1952 si contrattava anche il sabato (1.142 sabati): in quel periodo un mese ha in media 24,5 giorni di borsa, da giugno 1952 21,0.
 
 ## 2. La regola
 
@@ -24,7 +24,7 @@ Per ogni mese t:
 - peso(t) = 0,12 / σ annua (t).
 - rendimento gestito(t) = peso(t) × WML(t).
 
-Il primo mese con 126 giorni precedenti è maggio 1927, quindi replica e confronti partono da lì. Il fattore 21 e i 126 giorni sono quelli del paper anche per gli anni con il sabato: fino al 1952 la finestra copre circa cinque mesi e la varianza mensile è sottostimata di circa il 14% (24,5/21), quindi i pesi storici sono più alti di circa l'8%. Nel periodo di test non c'è differenza. In `strategia.varianza_prevista` la media mobile dei quadrati è presa all'ultimo giorno di ogni mese e assegnata al mese successivo. Che non ci siano dati futuri lo controllano tre test: alterare i giorni di un mese non cambia il peso di quel mese; troncare i dati alla fine di un mese non cambia nessun peso passato; sui dati reali, il peso di gennaio 2012 è già noto con i dati fino a dicembre 2011.
+Il primo mese con 126 giorni precedenti è maggio 1927, quindi replica e confronti partono da lì. Il fattore 21 e i 126 giorni sono quelli del paper anche per gli anni con il sabato: fino al 1952 la finestra copre circa cinque mesi e la varianza mensile è sottostimata di circa il 14% (21/24,5 ≈ 0,86), quindi i pesi storici sono più alti di circa l'8%. Nel periodo di test non c'è differenza. In `strategia.varianza_prevista` la media mobile dei quadrati è presa all'ultimo giorno di ogni mese e assegnata al mese successivo. Che non ci siano dati futuri lo controllano tre test automatici in `tests/`: alterare i giorni di un mese non cambia il peso di quel mese; troncare i dati alla fine di un mese non cambia nessun peso passato; sui dati reali, il peso di gennaio 2012 è già noto con i dati fino a dicembre 2011.
 
 **Differenza dal paper.** Il paper stima la varianza con i rendimenti giornalieri dei decili formati ogni mese. Io uso il file giornaliero di French, in cui i decili sono riformati ogni giorno (rendimento passato da −250 a −21 giorni). È l'unica fonte giornaliera gratuita; sugli Sharpe della replica (1,00 contro 0,97) la differenza conta poco, mentre sulle code del gestito la distanza dal paper è più ampia (curtosi 2,00 contro 2,68).
 
@@ -80,8 +80,8 @@ Il costo della variazione del peso è una precisazione che ho aggiunto ai criter
 
 - **Meccanismo.** Correlazione della volatilità prevista con la volatilità realizzata nel mese dopo (dai giornalieri dello stesso mese): +0,74 nel 1927-2011, +0,65 nel test. Correlazione con il rendimento del WML: −0,12 (t −3,9) nel 1927-2011 e −0,14 (t −1,9) nel test. Dividendo i mesi del test in tre gruppi in base al peso, il terzo con peso più basso (volatilità prevista più alta) ha media annua −3,86% con volatilità 34,74%; gli altri due hanno medie di 10,70% e 10,34% con volatilità 31,82% e 17,45%. Gli errori standard delle medie sono però grandi (15,7%, 14,5% e 7,9%), quindi nel test la differenza tra i gruppi non è significativa. Il quadro è coerente con l'idea del paper (il rendimento non sale con la volatilità, quindi scalare migliora lo Sharpe), che sul campione lungo è più netta.
 - **Pari volatilità.** Il WML semplice moltiplicato per una costante (0,423, scelta a posteriori perché abbia la stessa volatilità del gestito nel test) ha drawdown −32,71%, mese peggiore −13,57%, curtosi 2,10 e Sharpe 0,197. Il gestito ha −23,03%, −12,52%, 1,05 e 0,375. Due delle tre misure dell'ipotesi 1 (drawdown e mese peggiore) migliorano anche solo riducendo l'esposizione; quello che resta dopo questo confronto è il contributo del timing: circa 10 punti di drawdown, metà della curtosi e lo Sharpe, mentre sul mese peggiore il contributo è quasi nullo. L'ipotesi 1 era scritta contro il WML semplice e il verdetto resta quello, ma questa è la lettura più corretta.
-- **Crolli.** Nei 5 mesi peggiori del semplice il peso era tra 0,20 e 0,39 (tabella nel README, sezione 6.3). In quattro mesi su cinque i perdenti salgono molto più dei vincenti (fino a +46,75% ad aprile 2020); a luglio 2026, invece, sono i vincenti a crollare (−15,41%).
-- **Bootstrap.** Sensibilità a semi e lunghezza dei blocchi (sezione 4).
+- **Crolli.** Nei 5 mesi peggiori del semplice il peso era tra 0,20 e 0,39 (tabella nella [sezione 7.3 del README](../README.md#73-dove-nasce-il-miglioramento)). In quattro mesi su cinque i perdenti salgono molto più dei vincenti (fino a +46,75% ad aprile 2020); a luglio 2026, invece, sono i vincenti a crollare (−15,41%).
+- **Bootstrap.** Sensibilità a semi e lunghezza dei blocchi (sezione 4 di questo documento).
 
 ## 7. Collegamento con la letteratura
 

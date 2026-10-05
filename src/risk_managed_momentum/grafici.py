@@ -10,7 +10,7 @@ import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
 
 COLORI = {"wml": "#eb6834", "wml_gestita": "#2a78d6", "mercato": "#6b6b6b", "vincenti": "#1baf7a"}
-NOMI = {"wml": "WML semplice", "wml_gestita": "WML gestito", "mercato": "Mercato", "vincenti": "Vincenti solo lunghi"}
+NOMI = {"wml": "WML semplice", "wml_gestita": "WML gestito", "mercato": "Mercato (in eccesso su RF)", "vincenti": "Vincenti solo lunghi"}
 INCHIOSTRO, GRIGIO = "#222222", "#8a8a8a"
 
 
@@ -44,11 +44,11 @@ def capitale(x, percorso, titolo):
     ax.yaxis.set_major_locator(matplotlib.ticker.FixedLocator([0.5, 0.75, 1, 1.5, 2, 3, 4, 6, 8]))
     ax.yaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda v, _: f"{v:g}".replace(".", ",")))
     ax.yaxis.set_minor_locator(matplotlib.ticker.NullLocator())
-    ax.set_ylabel("valore di 1 € con i rendimenti in eccesso (scala log.)", fontsize=9, color="#444444")
+    ax.set_ylabel("valore di 1 € (scala logaritmica)", fontsize=9, color="#444444")
     ax.set_title(titolo, fontsize=11, loc="left", color=INCHIOSTRO)
     anni = range(x.index[0].year, x.index[-1].year + 1, 2)
     ax.set_xticks([pd.Timestamp(f"{a}-01-01") for a in anni], [str(a) for a in anni])
-    ax.set_xlim(right=x.index[-1] + pd.DateOffset(years=2))
+    ax.set_xlim(right=x.index[-1] + pd.DateOffset(years=4))
     fig.tight_layout()
     fig.savefig(percorso, dpi=130)
     plt.close(fig)
@@ -96,7 +96,7 @@ def peso(pesi, inizio_test, percorso):
 
 def sharpe_periodi(valori, percorso):
     """Barre dello Sharpe per periodo: valori = {periodo: {nome: sharpe}}."""
-    fig, ax = plt.subplots(figsize=(8, 4))
+    fig, ax = plt.subplots(figsize=(8.6, 4.2))
     _stile(ax)
     nomi = ["wml", "wml_gestita"]
     larghezza = 0.36
@@ -108,12 +108,14 @@ def sharpe_periodi(valori, percorso):
             ax.text(xpos, v + 0.02, f"{v:.2f}".replace(".", ","), ha="center", va="bottom", fontsize=9, color=INCHIOSTRO)
     ax.set_xticks(range(len(valori)))
     ax.set_xticklabels(list(valori), fontsize=9)
+    ax.axvline(0.5, color=GRIGIO, linewidth=0.8, linestyle=":")  # separa la replica dal test
     ax.yaxis.set_major_formatter(matplotlib.ticker.FuncFormatter(lambda v, _: f"{v:.1f}".replace(".", ",")))
     ax.set_ylabel("Sharpe annuo", fontsize=9, color="#444444")
     ax.set_ylim(0, max(max(v.values()) for v in valori.values()) * 1.18)
     ax.legend(handles=[matplotlib.patches.Patch(color=COLORI[n], label=NOMI[n]) for n in nomi],
               frameon=False, fontsize=9, loc="upper right")
-    ax.set_title("Sharpe del momentum semplice e gestito", fontsize=11, loc="left", color=INCHIOSTRO)
+    ax.set_title("Sharpe annuo del WML (vincenti meno perdenti), semplice e gestito", fontsize=11, loc="left",
+                 color=INCHIOSTRO)
     fig.tight_layout()
     fig.savefig(percorso, dpi=130)
     plt.close(fig)
