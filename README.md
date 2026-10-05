@@ -159,9 +159,13 @@ Per sottoperiodi il quadro è meno uniforme. Nel 2012-2015 le due versioni hanno
 
 I file di French non dicono quanto si scambia, quindi i costi sono ipotesi esplicite (dettagli in [docs/metodo.md](docs/metodo.md)):
 
-I file di French non dicono quanto si scambia, quindi i costi sono ipotesi esplicite (dettagli in [docs/metodo.md](docs/metodo.md)):
+| Scenario | Prestito titoli | Negoziazione | Variazione del peso | Sharpe semplice | Sharpe gestito | Differenza [IC 95%] |
+|---|---|---|---|---|---|---|
+| lordo | 0% | 0% | 0 pb | 0,20 | 0,37 | +0,177 [+0,003; +0,333] |
+| medio | 0,5% | 2% | 10 pb | 0,04 | 0,19 | +0,144 [−0,029; +0,298] |
+| alto | 1% | 4% | 20 pb | −0,11 | 0,00 | +0,110 [−0,062; +0,263] |
 
-Il gestito resta davanti al semplice in tutti gli scenari, perché ha esposizione media più bassa e quindi paga meno; con i costi però la differenza non è più distinguibile da zero. Negli scenari medio e alto nessuna delle due versioni lungo-corte ha un rendimento interessante nel periodo di test.
+Il gestito resta davanti al semplice in tutti gli scenari perché parte da uno Sharpe lordo più alto. Paga circa metà dei costi in punti di rendimento, ma ha meno della metà della volatilità, quindi in termini di Sharpe i costi lo penalizzano un po' di più: la differenza scende a +0,144 e +0,110 e non è più distinguibile da zero. Negli scenari medio e alto nessuna delle due versioni lungo-corte ha un rendimento interessante nel periodo di test.
 
 ## 8. Limiti
 
@@ -232,20 +236,18 @@ config_congelata.json
 | Rendimento in eccesso | Rendimento meno RF: quello che una strategia guadagna in più rispetto alla liquidità. |
 | Mercato (Mkt-RF) | Rendimento in eccesso di tutte le azioni USA quotate su NYSE, AMEX e NASDAQ, pesate per capitalizzazione. |
 | Volatilità | Deviazione standard dei rendimenti, espressa su base annua. Prevista: stimata con i dati passati; realizzata: misurata dopo, sul periodo stesso. Volatilità obiettivo: il 12% annuo a cui la strategia gestita cerca di portare il rischio. |
-| Peso, esposizione, leva | Peso = quanto si investe nella strategia per ogni dollaro di capitale. Esposizione lorda del lungo-corto = 2 × peso (gamba lunga più gamba corta); nozionale corto = peso. Con peso sopra 1 si investe più del WML semplice: è leva rispetto alla strategia di base. |
+| Peso, esposizione, leva | Peso = quanto si investe nella strategia per ogni dollaro di capitale. Esposizione lorda del lungo-corto = 2 × peso (gamba lunga più gamba corta); nozionale corto (valore dei titoli venduti allo scoperto) = peso. Con peso sopra 1 si investe più del WML semplice: è leva rispetto alla strategia di base. |
 | Indice di Sharpe | Rendimento medio in eccesso diviso per la volatilità, su base annua: quanto rende ogni unità di rischio. Non cambia se si moltiplica la strategia per una costante positiva. |
-| Drawdown massimo | La perdita più grande dal punto più alto precedente del capitale (per esempio −64,8% = il capitale è sceso al 35,2% del suo massimo). |
-| Mese peggiore | Il rendimento mensile più basso del periodo. |
+| Drawdown massimo, mese peggiore | Drawdown massimo: la perdita più grande dal punto più alto precedente del capitale (per esempio −64,8% = il capitale è sceso al 35,2% del suo massimo). Mese peggiore: il rendimento mensile più basso del periodo. |
 | Asimmetria | Misura se le perdite estreme sono più ampie dei guadagni estremi (negativa, coda sinistra più lunga) o il contrario (positiva). |
 | Curtosi in eccesso | Misura le code della distribuzione rispetto a una normale con la stessa volatilità (che ha 0): valori alti vogliono dire mesi estremi più frequenti di quanto la volatilità farebbe pensare. |
 | Pari volatilità | WML semplice moltiplicato per una costante, scelta in modo che abbia la stessa volatilità del gestito: separa l'effetto del "quanto" rischio da quello del "quando". |
 | Replica, fuori campione, test, sottoperiodo | Replica: rifare i conti del paper sul suo periodo (1927-2011). Fuori campione o test: il periodo che il paper non ha visto (gennaio 2012 - agosto 2026). Sottoperiodo: una parte del test (2012-2015 e 2016-2026). Da non confondere con i test automatici del codice (cartella `tests/`) e con i test statistici. |
 | Errore standard, t, p | Errore standard: incertezza di una stima. t = stima / errore standard (oltre circa 2 in valore assoluto la stima è distinguibile da zero). p: probabilità di un risultato almeno così estremo se l'effetto vero fosse zero. |
 | Intervallo di confidenza al 95% (IC 95%) | Intervallo costruito in modo da contenere il valore vero nel 95% dei casi: se è tutto sopra lo zero, la differenza è distinguibile da zero. |
-| Bootstrap stazionario | Si ricrea molte volte (10.000) una storia alternativa ricampionando blocchi di mesi consecutivi, di lunghezza casuale e in media di 6 mesi, per misurare l'incertezza senza supporre rendimenti normali. Test di Jobson-Korkie con la correzione di Memmel: controllo classico sulla differenza di Sharpe, che suppone rendimenti indipendenti e normali. |
+| Bootstrap stazionario | Si ricrea molte volte (10.000) una storia alternativa ricampionando blocchi di mesi consecutivi, di lunghezza casuale e in media di 6 mesi, per misurare l'incertezza senza supporre rendimenti normali. Il seme fissa la sequenza casuale, così il risultato è riproducibile. Test di Jobson-Korkie con la correzione di Memmel: controllo classico sulla differenza di Sharpe, che suppone rendimenti indipendenti e normali. |
 | Alfa e beta | Regredendo il gestito sul semplice: beta = quanta parte del semplice contiene; alfa = rendimento in più che rimane, su base annua. Newey e West: metodo per calcolare l'errore standard quando i mesi sono correlati tra loro. |
-| Punti base (pb) | Centesimi di punto percentuale: 10 pb = 0,10%. |
-| Costi: prestito titoli, negoziazione, variazione del peso | Prestito: quanto si paga all'anno per prendere in prestito i titoli venduti allo scoperto. Negoziazione: costo annuo del ribilanciamento dei decili, che cambiano composizione ogni mese (turnover = quota del portafoglio scambiata). Variazione del peso: costo di comprare o vendere quando il peso cambia da un mese all'altro. Scenari lordo, medio, alto: nessun costo, costi moderati, costi elevati (sezione 7.4). |
+| Costi: prestito titoli, negoziazione, variazione del peso | Prestito: quanto si paga all'anno per prendere in prestito i titoli venduti allo scoperto. Negoziazione: costo annuo del ribilanciamento dei decili, che cambiano composizione ogni mese (turnover = quota del portafoglio scambiata). Variazione del peso: costo di comprare o vendere quando il peso cambia da un mese all'altro. Scenari lordo, medio, alto: nessun costo, costi moderati, costi elevati (sezione 7.4). Punti base (pb): centesimi di punto percentuale, 10 pb = 0,10%. |
 | Ribilanciamento, ricostituzione | Ribilanciamento: riportare ogni mese la strategia al peso deciso. Ricostituzione: rifare l'ordinamento dei titoli nei decili (ogni mese nei file mensili, ogni giorno nei giornalieri). |
 | Mercato + WML gestito | Somma dei due rendimenti in eccesso: si tiene il mercato e in più il WML gestito sopra (sovrapposizione), quindi l'esposizione totale è sopra 1. |
 | Anomalia | Regolarità dei rendimenti non spiegata dai modelli di rischio standard, come il momentum. |

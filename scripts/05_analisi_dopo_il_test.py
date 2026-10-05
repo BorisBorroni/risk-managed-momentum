@@ -1,7 +1,8 @@
 """Analisi descrittive fatte DOPO il test: non cambiano il verdetto, aiutano a leggerlo.
 
-1. Meccanismo: la volatilita' prevista anticipa la volatilita' realizzata del mese dopo, ma non
-   il suo rendimento (se fosse cosi', il peso toglierebbe rischio senza togliere rendimento atteso).
+1. Meccanismo: la volatilita' prevista anticipa la volatilita' realizzata del mese dopo, mentre il
+   rendimento non sale quando la volatilita' prevista e' alta (cosi' il peso toglie rischio senza
+   togliere rendimento atteso).
 2. Il quando contro il quanto: WML semplice scalato con una costante fino
    ad avere la stessa volatilita' del gestito nel test (la costante usa dati del test: e' solo un confronto).
 3. Crolli: peso del WML gestito, decile vincente e perdente nei 5 mesi peggiori del WML semplice nel test.

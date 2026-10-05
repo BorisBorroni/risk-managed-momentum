@@ -5,3 +5,4 @@ matplotlib
 nbformat
 nbclient
 ipykernel
+pytest

@@ -9,7 +9,7 @@ Ogni zip di French contiene un CSV con più blocchi uno sotto l'altro: rendiment
 Controlli in `scripts/01_controlla_dati.py`:
 
 - nessun valore mancante e nessun mese saltato;
-- mensili da 1927-01 a 2026-08 (1.196 mesi), giornalieri dal 1926-11-03 al 2026-08-31 (26.216 giorni), gli stessi giorni nei quattro file giornalieri;
+- mensili da 1927-01 a 2026-08 (1.196 mesi), giornalieri dal 1926-11-03 al 2026-08-31 (26.216 giorni); i giorni dei decili sono presenti in tutti gli altri file giornalieri (i fattori partono da luglio 1926);
 - fattore Mom ricostruito dai 6 portafogli come 0,5 × (vincenti piccoli + vincenti grandi) − 0,5 × (perdenti piccoli + perdenti grandi): differenza massima 0,01 punti percentuali, sia mensile sia giornaliero, cioè l'arrotondamento dei file;
 - mercato mensile (Mkt-RF + RF) contro il composto dei giornalieri dello stesso mese: 1 mese su 1.201 differisce di più di 0,2 punti (settembre 1931, 0,40 punti).
 
@@ -36,7 +36,7 @@ Su rendimenti mensili in eccesso:
 
 - media annua = 12 × media mensile; volatilità annua = deviazione standard (ddof = 1) × √12; Sharpe = media / deviazione standard × √12;
 - asimmetria = m3 / m2^1,5 e curtosi in eccesso = m4 / m2² − 3, con i momenti centrali della popolazione;
-- drawdown massimo sul capitale composto 1 × Π(1 + r), con il capitale iniziale come primo massimo. Per il lungo-corto è il capitale di chi tiene la liquidità al tasso privo di rischio e aggiunge la strategia: il drawdown riguarda la parte in eccesso;
+- drawdown massimo sul capitale composto 1 × Π(1 + r), con il capitale iniziale come primo massimo. Per la strategia lungo-corta approssima il capitale di chi tiene la liquidità al tasso privo di rischio e aggiunge la strategia: il drawdown riguarda la parte in eccesso;
 - alfa: regressione mensile gestito = α + β × semplice + errore, con errori standard di Newey e West (6 ritardi); α annuo = 12 × α mensile.
 
 Le convenzioni su curtosi e drawdown sono state scritte nei criteri prima del test. La scelta conta poco: nella replica la curtosi corretta per il campione sarebbe 18,04 invece di 17,95 per il semplice e 2,01 invece di 2,00 per il gestito.
